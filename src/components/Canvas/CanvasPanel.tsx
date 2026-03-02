@@ -84,9 +84,13 @@ export const CanvasPanel = forwardRef<CanvasPanelRef, CanvasPanelProps>(({ sessi
     if (!sessionId) return;
 
     // Connect to canvas WebSocket
-    const ws = new WebSocket(
-      `ws://localhost:3001/api/sessions/${sessionId}/canvas`
-    );
+    // Use current host in production, localhost in development
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const wsUrl = `${protocol}//${host}/api/sessions/${sessionId}/canvas`;
+    
+    console.log('Connecting to canvas WebSocket:', wsUrl);
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       console.log('Canvas WebSocket connected');
