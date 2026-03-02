@@ -14,14 +14,13 @@ docker build -t python-sandbox:latest .
 cd ../..
 echo "✅ Docker образ собран"
 
-# 2. Сборка Backend
+# 2. Установка Backend зависимостей
 echo ""
-echo "🔧 Сборка Backend..."
+echo "🔧 Установка Backend зависимостей..."
 cd backend
 npm install
-npm run build
 cd ..
-echo "✅ Backend собран"
+echo "✅ Backend готов"
 
 # 3. Сборка Frontend
 echo ""
@@ -44,7 +43,7 @@ Type=simple
 WorkingDirectory=$(pwd)/backend
 Environment=NODE_ENV=production
 Environment=PORT=3001
-ExecStart=$(which node) dist/server.js
+ExecStart=$(pwd)/backend/node_modules/.bin/tsx src/server.ts
 Restart=always
 RestartSec=10
 StandardOutput=journal

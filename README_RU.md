@@ -18,17 +18,20 @@
 ## 🏗️ Архитектура
 
 ### **Frontend** (React + Vite + TypeScript)
+
 - **Monaco Editor** - Редактор кода на основе VSCode
 - **xterm.js** - Эмулятор терминала для вывода
 - **Canvas Renderer** - Собственный рендерер для turtle графики
 
 ### **Backend** (Node.js + Express + Docker)
+
 - **Управление сессиями** - Изолированное окружение для каждого пользователя
 - **PTY Manager** - Настоящий псевдотерминал для выполнения Python
 - **Docker контейнеры** - Песочница с CPython 3.11
 - **WebSockets** - Двусторонняя связь в реальном времени
 
 ### **Python Sandbox** (Docker)
+
 - **База**: `python:3.11-slim`
 - **Библиотеки**: numpy, matplotlib, pillow
 - **Безопасность**: Лимиты ресурсов, изоляция сети, непривилегированный пользователь
@@ -39,6 +42,7 @@
 ## 🚀 Быстрый старт
 
 ### Требования
+
 - Node.js 20+
 - Docker Desktop
 - npm или yarn
@@ -112,11 +116,13 @@ npm run dev
 ### Переменные окружения
 
 **Frontend** (`.env`):
+
 ```env
 VITE_BACKEND_URL=http://localhost:3001
 ```
 
 **Backend** (`backend/.env`):
+
 ```env
 PORT=3001
 SESSION_TIMEOUT_MINUTES=30
@@ -200,6 +206,7 @@ npm run test:e2e
 ## 🛠️ Технологический стек
 
 **Frontend:**
+
 - React 18
 - TypeScript
 - Vite
@@ -208,6 +215,7 @@ npm run test:e2e
 - Zustand
 
 **Backend:**
+
 - Node.js
 - Express
 - WebSocket (ws)
@@ -215,6 +223,7 @@ npm run test:e2e
 - TypeScript
 
 **Инфраструктура:**
+
 - Docker
 - Python 3.11
 
