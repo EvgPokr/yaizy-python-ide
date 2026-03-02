@@ -62,6 +62,12 @@ echo "✅ Backend запущен"
 echo ""
 echo "🌐 Настройка Nginx..."
 cat > /etc/nginx/sites-available/python-ide << EOF
+# WebSocket upgrade map
+map \$http_upgrade \$connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
 server {
     listen 80;
     server_name _;
@@ -76,19 +82,30 @@ server {
     location /api {
         proxy_pass http://localhost:3001;
         proxy_http_version 1.1;
+        
+        # WebSocket headers
         proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
+        proxy_set_header Connection \$connection_upgrade;
+        
+        # Standard proxy headers
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
-        proxy_cache_bypass \$http_upgrade;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
         
-        # Увеличиваем таймауты для WebSocket
+        # WebSocket timeouts
         proxy_read_timeout 86400s;
         proxy_send_timeout 86400s;
+        proxy_connect_timeout 10s;
+        
+        # Disable buffering for real-time communication
+        proxy_buffering off;
     }
     
     location /health {
         proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
     }
     
     client_max_body_size 10M;
