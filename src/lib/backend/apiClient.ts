@@ -178,6 +178,14 @@ class APIClient {
    * Get WebSocket URL
    */
   getWebSocketUrl(sessionId: string): string {
+    // In production (baseUrl is empty), use current host
+    if (!this.baseUrl) {
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      const host = window.location.host;
+      return `${wsProtocol}://${host}/api/sessions/${sessionId}/terminal`;
+    }
+    
+    // In development, use configured baseUrl
     const wsProtocol = this.baseUrl.startsWith('https') ? 'wss' : 'ws';
     const baseUrl = this.baseUrl.replace(/^https?:\/\//, '');
     return `${wsProtocol}://${baseUrl}/api/sessions/${sessionId}/terminal`;
