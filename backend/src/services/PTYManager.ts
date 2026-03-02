@@ -147,7 +147,8 @@ export class PTYManager {
       console.log(`Code written to ${filePath} for session ${sessionId}`);
 
       // Use run_python.sh wrapper that handles all technical setup silently
-      const command = `/usr/local/bin/run_python.sh /workspace/${filename}`;
+      // Prefix with space to hide from bash history and add stty -echo to disable echo
+      const command = ` stty -echo; /usr/local/bin/run_python.sh /workspace/${filename}; stty echo`;
       
       this.write(sessionId, `${command}\n`);
 

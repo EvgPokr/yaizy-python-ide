@@ -68,5 +68,5 @@ WORKDIR /workspace
 # Switch to non-root user  
 USER student
 
-# Keep container alive with bash
-CMD ["/bin/bash", "-c", "tail -f /dev/null"]
+# Keep container alive with bash (disable command echo with set +v)
+CMD ["/bin/bash", "-c", "set +v; tail -f /dev/null"]
