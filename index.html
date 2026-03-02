@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/yaizy-logo-dark.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Python Editor | YaizY</title>
+    <meta name="description" content="Learn Python with YaizY's browser-based IDE. No installation required!" />
+    
+    <!-- Preconnect for Pyodide CDN -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    
+    <!-- YaizY branding -->
+    <meta name="theme-color" content="#00A8FF" />
+    <meta property="og:title" content="YaizY Python IDE" />
+    <meta property="og:description" content="Learn Python programming in your browser" />
+    
+    <!-- Optional assignment configuration -->
+    <script>
+      // Example assignment configuration
+      window.PYTHON_IDE_CONFIG = {
+        enableExampleTask: true, // Enable example assignment
+        // or set a specific assignment:
+        // task: {
+        //   id: 'custom-1',
+        //   title: 'My Assignment',
+        //   description: 'Description...',
+        //   requirements: [...],
+        //   hints: [...]
+        // }
+      };
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

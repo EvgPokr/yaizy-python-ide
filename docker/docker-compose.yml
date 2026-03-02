@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # Python Editor Backend
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - FRONTEND_URL=http://localhost:5173
+      - DOCKER_IMAGE=python-sandbox:latest
+      - WORKSPACE_BASE_DIR=/tmp/python-sessions
+      - SESSION_TIMEOUT_MS=300000
+      - EXECUTION_TIMEOUT_MS=10000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/python-sessions:/tmp/python-sessions
+      - ../backend/src:/app/src
+    depends_on:
+      - python-sandbox
+    restart: unless-stopped
+    networks:
+      - python-ide-network
+
+  # Python sandbox (this just builds the image, actual containers are created dynamically)
+  python-sandbox:
+    build:
+      context: ./python-sandbox
+      dockerfile: Dockerfile
+    image: python-sandbox:latest
+    command: /bin/true
+    networks:
+      - python-ide-network
+
+networks:
+  python-ide-network:
+    driver: bridge
+
+volumes:
+  python-sessions:

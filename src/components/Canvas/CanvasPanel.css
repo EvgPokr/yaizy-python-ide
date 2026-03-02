@@ -1,0 +1,161 @@
+.canvas-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #1e1e1e;
+  border-left: 1px solid #333;
+}
+
+.canvas-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  text-align: center;
+  padding: 2rem;
+}
+
+.canvas-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.canvas-placeholder p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.canvas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #252526;
+  border-bottom: 1px solid #3e3e42;
+}
+
+.canvas-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.canvas-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.canvas-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4CAF50;
+  font-size: 0.85rem;
+}
+
+.drawing-indicator {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.canvas-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+  background: #1a1a1a;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-placeholder-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #666;
+  text-align: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.canvas-placeholder-overlay .canvas-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.canvas-placeholder-overlay p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.turtle-canvas {
+  background: white;
+  z-index: 2;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.canvas-toggle-btn {
+  background: transparent;
+  border: 1px solid #3e3e42;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+}
+
+.canvas-toggle-btn:hover {
+  background: #3e3e42;
+  border-color: #555555;
+}
+
+.canvas-toggle-btn:active {
+  background: #4e4e4e;
+}
+
+.canvas-panel.collapsed {
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.canvas-panel.collapsed .canvas-content {
+  display: none;
+}
+
+.canvas-panel.collapsed .canvas-header {
+  border-bottom: none;
+}
