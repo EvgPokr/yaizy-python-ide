@@ -146,13 +146,8 @@ export class PTYManager {
       await fs.writeFile(filePath, code, 'utf-8');
       console.log(`Code written to ${filePath} for session ${sessionId}`);
 
-      // Use input_fix.py wrapper that fixes input() prompts
-      // set +v = disable verbose mode (don't show commands)
-      // trap '' SIGINT = block SIGINT during execution
-      // PYTHONUNBUFFERED=1 = force unbuffered I/O
-      // python3 -u = unbuffered mode
-      // input_fix.py = wrapper that makes input() show prompts immediately
-      const command = `set +v; trap '' SIGINT; export PYTHONUNBUFFERED=1; python3 -u /usr/local/bin/input_fix.py /workspace/${filename}; EXIT_CODE=$?; trap - SIGINT; echo "__EXECUTION_COMPLETE__:$EXIT_CODE"`;
+      // Use run_python.sh wrapper that handles all technical setup silently
+      const command = `/usr/local/bin/run_python.sh /workspace/${filename}`;
       
       this.write(sessionId, `${command}\n`);
 

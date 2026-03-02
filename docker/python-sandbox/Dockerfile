@@ -44,6 +44,10 @@ RUN chmod +x /usr/local/bin/flush_input.py
 COPY input_fix.py /usr/local/bin/input_fix.py
 RUN chmod +x /usr/local/bin/input_fix.py
 
+# Copy run_python wrapper (runs Python without showing technical commands)
+COPY run_python.sh /usr/local/bin/run_python.sh
+RUN chmod +x /usr/local/bin/run_python.sh
+
 # Copy TTY init script (sets up proper terminal)
 COPY init_tty.sh /usr/local/bin/init_tty.sh
 RUN chmod +x /usr/local/bin/init_tty.sh
