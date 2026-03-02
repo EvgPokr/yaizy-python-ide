@@ -91,34 +91,29 @@ export class TerminalWebSocketHandler {
       const chunkStr = chunk.toString('utf-8');
       dataBuffer += chunkStr;
 
-      // Check for run start marker and hide command echo
-      if (dataBuffer.includes('__RUN_START__')) {
-        const startIdx = dataBuffer.indexOf('__RUN_START__');
-        dataBuffer = dataBuffer.substring(0, startIdx) + dataBuffer.substring(startIdx + '__RUN_START__'.length);
-        hideCommandEcho = true;
+      // Filter out technical lines (bash prompts, commands, etc)
+      const lines = dataBuffer.split('\n');
+      const filteredLines: string[] = [];
+      
+      for (const line of lines) {
+        const trimmed = line.trim();
+        
+        // Skip technical lines
+        if (
+          trimmed.includes('/usr/local/bin/run_python.sh') ||
+          trimmed.startsWith('echo ""') ||
+          trimmed === '__RUN_START__' ||
+          trimmed.startsWith('stty ') ||
+          /^student@[a-f0-9]+:\/workspace\$/.test(trimmed) || // Skip bash prompt
+          trimmed.startsWith('student@') && trimmed.includes(':/workspace$')
+        ) {
+          continue;
+        }
+        
+        filteredLines.push(line);
       }
       
-      // If we're in command echo hiding mode, skip lines until we see real output
-      if (hideCommandEcho) {
-        // Skip the command line itself (starts with /usr/local/bin/run_python.sh)
-        const lines = dataBuffer.split('\n');
-        const filtered = lines.filter(line => {
-          const trimmed = line.trim();
-          // Skip command lines and empty lines
-          if (trimmed.startsWith('/usr/local/bin/run_python.sh') || 
-              trimmed.startsWith('stty ') ||
-              trimmed === '__RUN_START__') {
-            return false;
-          }
-          return true;
-        });
-        
-        // If we filtered something out, we found the command
-        if (filtered.length < lines.length) {
-          dataBuffer = filtered.join('\n');
-          hideCommandEcho = false;
-        }
-      }
+      dataBuffer = filteredLines.join('\n');
 
       // Check for canvas markers
       const canvasMarker = '__CANVAS__';
