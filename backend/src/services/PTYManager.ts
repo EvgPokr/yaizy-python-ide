@@ -146,13 +146,8 @@ export class PTYManager {
       await fs.writeFile(filePath, code, 'utf-8');
       console.log(`Code written to ${filePath} for session ${sessionId}`);
 
-      // Mark execution start with special marker
-      this.write(sessionId, `echo "__RUN_START__"\n`);
-      
-      // Run Python command
+      // Run Python command (wrapper handles all technical setup)
       this.write(sessionId, `/usr/local/bin/run_python.sh /workspace/${filename}\n`);
-      
-      // Mark execution end with special marker (done in run_python.sh via __EXECUTION_COMPLETE__)
 
       // Set execution timeout
       const timeout = setTimeout(() => {

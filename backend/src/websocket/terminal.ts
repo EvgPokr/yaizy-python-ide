@@ -92,25 +92,33 @@ export class TerminalWebSocketHandler {
       dataBuffer += chunkStr;
 
       // Filter out technical lines (bash prompts, commands, etc)
+      const linesToFilter = [
+        /\/usr\/local\/bin\/run_python\.sh/,  // Command itself
+        /^echo\s+"__RUN_START__"/,             // echo command
+        /^__RUN_START__\s*$/,                  // __RUN_START__ marker
+        /^stty\s+/,                            // stty commands
+        /^student@[a-f0-9]+:\/workspace\$/,   // Bash prompt at start of line
+        /student@[a-f0-9]+:\/workspace\$\s*$/, // Bash prompt at end
+      ];
+      
       const lines = dataBuffer.split('\n');
       const filteredLines: string[] = [];
       
       for (const line of lines) {
         const trimmed = line.trim();
         
-        // Skip technical lines
-        if (
-          trimmed.includes('/usr/local/bin/run_python.sh') ||
-          trimmed.startsWith('echo ""') ||
-          trimmed === '__RUN_START__' ||
-          trimmed.startsWith('stty ') ||
-          /^student@[a-f0-9]+:\/workspace\$/.test(trimmed) || // Skip bash prompt
-          trimmed.startsWith('student@') && trimmed.includes(':/workspace$')
-        ) {
-          continue;
+        // Check if line matches any filter pattern
+        let shouldSkip = false;
+        for (const pattern of linesToFilter) {
+          if (pattern.test(trimmed)) {
+            shouldSkip = true;
+            break;
+          }
         }
         
-        filteredLines.push(line);
+        if (!shouldSkip) {
+          filteredLines.push(line);
+        }
       }
       
       dataBuffer = filteredLines.join('\n');
