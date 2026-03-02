@@ -52,12 +52,15 @@ Requires=docker.service
 
 [Service]
 Type=simple
+User=root
+Group=root
 WorkingDirectory=$(pwd)
-ExecStart=$(pwd)/start-backend.sh
+ExecStart=/bin/bash $(pwd)/start-backend.sh
 Restart=always
 RestartSec=10
 StandardOutput=journal
 StandardError=journal
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 [Install]
 WantedBy=multi-user.target
@@ -66,8 +69,17 @@ EOF
 systemctl daemon-reload
 systemctl enable python-ide
 systemctl restart python-ide
-sleep 2
-systemctl status python-ide --no-pager
+sleep 3
+
+echo ""
+echo "📊 Проверка статуса Backend..."
+systemctl status python-ide --no-pager -l || true
+
+echo ""
+echo "📝 Последние логи Backend..."
+journalctl -u python-ide -n 20 --no-pager || true
+
+echo ""
 echo "✅ Backend запущен"
 
 # 5. Настройка Nginx
