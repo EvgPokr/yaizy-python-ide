@@ -149,7 +149,17 @@ export class TerminalWebSocketHandler {
         // Remove marker from buffer
         const beforeComplete = dataBuffer.substring(0, completeIdx);
         const afterComplete = dataBuffer.substring(completeIdx + completeMarker.length + (exitCodeMatch ? exitCodeMatch[1].length : 0));
-        dataBuffer = beforeComplete + afterComplete;
+        
+        // Flush any remaining data BEFORE completion
+        if (beforeComplete.trim()) {
+          const flushMessage: WebSocketMessage = {
+            type: 'stdout',
+            data: beforeComplete,
+          };
+          ws.send(JSON.stringify(flushMessage));
+        }
+        
+        dataBuffer = afterComplete;
 
         // Clear execution timeout in PTYManager
         this.ptyManager.clearExecutionTimeout(sessionId);
@@ -168,32 +178,25 @@ export class TerminalWebSocketHandler {
       }
 
       // Send remaining buffer data to terminal (without canvas/turtle messages)
-      // Only flush if buffer doesn't contain incomplete markers
-      const hasIncompleteMarker = 
-        dataBuffer.includes('__CANVAS__') || 
-        dataBuffer.includes('__TURTLE_CMD__');
+      // Only hold back if buffer contains incomplete markers
+      const hasIncompleteCanvasMarker = 
+        dataBuffer.includes('__CANVAS__') && !dataBuffer.includes('__CANVAS____CANVAS__');
+      const hasIncompleteTurtleMarker = 
+        dataBuffer.includes('__TURTLE_CMD__') && !dataBuffer.includes('__TURTLE_CMD____TURTLE_CMD__');
+      const hasIncompleteMarker = hasIncompleteCanvasMarker || hasIncompleteTurtleMarker;
       
       if (dataBuffer.length > 0 && !hasIncompleteMarker) {
-        // Split by lines and send complete lines
-        const lines = dataBuffer.split('\n');
-        
-        // Keep the last incomplete line in buffer
-        const lastLine = lines.pop() || '';
-        
-        if (lines.length > 0) {
-          const toSend = lines.join('\n') + '\n';
-          const message: WebSocketMessage = {
-            type: 'stdout',
-            data: toSend,
-          };
-          ws.send(JSON.stringify(message));
-        }
-        
-        dataBuffer = lastLine;
+        // Send everything immediately - don't buffer incomplete lines
+        const message: WebSocketMessage = {
+          type: 'stdout',
+          data: dataBuffer,
+        };
+        ws.send(JSON.stringify(message));
+        dataBuffer = '';
       }
       
-      // If buffer gets too large (e.g., long line with no newline), flush it anyway
-      if (dataBuffer.length > 10000 && !hasIncompleteMarker) {
+      // If buffer gets too large, flush it anyway
+      if (dataBuffer.length > 1000 && !hasIncompleteMarker) {
         const message: WebSocketMessage = {
           type: 'stdout',
           data: dataBuffer,

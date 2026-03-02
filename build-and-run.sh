@@ -29,7 +29,19 @@ npm install
 npm run build
 echo "✅ Frontend собран"
 
-# 4. Настройка systemd
+# 4. Создание скрипта запуска
+echo ""
+echo "⚙️ Создание скрипта запуска..."
+cat > start-backend.sh << 'SCRIPT_EOF'
+#!/bin/bash
+cd /opt/python-ide/backend
+export NODE_ENV=production
+export PORT=3001
+exec node_modules/.bin/tsx src/server.ts
+SCRIPT_EOF
+chmod +x start-backend.sh
+
+# 5. Настройка systemd
 echo ""
 echo "⚙️ Настройка автозапуска..."
 cat > /etc/systemd/system/python-ide.service << EOF
@@ -40,10 +52,8 @@ Requires=docker.service
 
 [Service]
 Type=simple
-WorkingDirectory=$(pwd)/backend
-Environment=NODE_ENV=production
-Environment=PORT=3001
-ExecStart=$(pwd)/backend/node_modules/.bin/tsx src/server.ts
+WorkingDirectory=$(pwd)
+ExecStart=$(pwd)/start-backend.sh
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -55,7 +65,9 @@ EOF
 
 systemctl daemon-reload
 systemctl enable python-ide
-systemctl start python-ide
+systemctl restart python-ide
+sleep 2
+systemctl status python-ide --no-pager
 echo "✅ Backend запущен"
 
 # 5. Настройка Nginx
