@@ -2,7 +2,10 @@
  * REST API client for backend Python execution
  */
 
-const API_BASE_URL = (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3001';
+// In production, use empty string for relative URLs (proxied by nginx)
+// In development, use localhost:3001
+const API_BASE_URL = (import.meta as any).env?.VITE_BACKEND_URL || 
+  ((import.meta as any).env?.MODE === 'production' ? '' : 'http://localhost:3001');
 
 export interface SessionCreateResponse {
   sessionId: string;
