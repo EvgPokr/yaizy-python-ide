@@ -146,21 +146,13 @@ export class PTYManager {
       await fs.writeFile(filePath, code, 'utf-8');
       console.log(`Code written to ${filePath} for session ${sessionId}`);
 
-      // Disable terminal echo, run Python, then re-enable echo
-      // This hides the command from being displayed in terminal
-      this.write(sessionId, `stty -echo\n`);
+      // Mark execution start with special marker
+      this.write(sessionId, `echo "__RUN_START__"\n`);
       
-      // Wait a bit for stty to apply
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
-      // Run Python command (won't be visible due to stty -echo)
+      // Run Python command
       this.write(sessionId, `/usr/local/bin/run_python.sh /workspace/${filename}\n`);
       
-      // Wait a bit before re-enabling echo
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
-      // Re-enable echo for input()
-      this.write(sessionId, `stty echo\n`);
+      // Mark execution end with special marker (done in run_python.sh via __EXECUTION_COMPLETE__)
 
       // Set execution timeout
       const timeout = setTimeout(() => {

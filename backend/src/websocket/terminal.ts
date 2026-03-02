@@ -61,6 +61,8 @@ export class TerminalWebSocketHandler {
 
     // Buffer for accumulating data and detecting canvas markers
     let dataBuffer = '';
+    let skipUntilRunStart = false;
+    let hideCommandEcho = false;
     
     // Flush interval to prevent stuck buffers
     const flushInterval = setInterval(() => {
@@ -86,7 +88,37 @@ export class TerminalWebSocketHandler {
       if (ws.readyState !== WebSocket.OPEN) return;
 
       // Accumulate data in buffer
-      dataBuffer += chunk.toString('utf-8');
+      const chunkStr = chunk.toString('utf-8');
+      dataBuffer += chunkStr;
+
+      // Check for run start marker and hide command echo
+      if (dataBuffer.includes('__RUN_START__')) {
+        const startIdx = dataBuffer.indexOf('__RUN_START__');
+        dataBuffer = dataBuffer.substring(0, startIdx) + dataBuffer.substring(startIdx + '__RUN_START__'.length);
+        hideCommandEcho = true;
+      }
+      
+      // If we're in command echo hiding mode, skip lines until we see real output
+      if (hideCommandEcho) {
+        // Skip the command line itself (starts with /usr/local/bin/run_python.sh)
+        const lines = dataBuffer.split('\n');
+        const filtered = lines.filter(line => {
+          const trimmed = line.trim();
+          // Skip command lines and empty lines
+          if (trimmed.startsWith('/usr/local/bin/run_python.sh') || 
+              trimmed.startsWith('stty ') ||
+              trimmed === '__RUN_START__') {
+            return false;
+          }
+          return true;
+        });
+        
+        // If we filtered something out, we found the command
+        if (filtered.length < lines.length) {
+          dataBuffer = filtered.join('\n');
+          hideCommandEcho = false;
+        }
+      }
 
       // Check for canvas markers
       const canvasMarker = '__CANVAS__';
