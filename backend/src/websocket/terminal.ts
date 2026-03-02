@@ -61,6 +61,25 @@ export class TerminalWebSocketHandler {
 
     // Buffer for accumulating data and detecting canvas markers
     let dataBuffer = '';
+    
+    // Flush interval to prevent stuck buffers
+    const flushInterval = setInterval(() => {
+      if (dataBuffer.length > 0 && ws.readyState === WebSocket.OPEN) {
+        const hasIncompleteMarker = 
+          (dataBuffer.includes('__CANVAS__') && !dataBuffer.includes('__CANVAS____CANVAS__')) ||
+          (dataBuffer.includes('__TURTLE_CMD__') && !dataBuffer.includes('__TURTLE_CMD____TURTLE_CMD__')) ||
+          (dataBuffer.includes('__EXECUTION_COMPLETE__:') && !dataBuffer.match(/__EXECUTION_COMPLETE__:\d+/));
+        
+        if (!hasIncompleteMarker) {
+          const message: WebSocketMessage = {
+            type: 'stdout',
+            data: dataBuffer,
+          };
+          ws.send(JSON.stringify(message));
+          dataBuffer = '';
+        }
+      }
+    }, 100); // Flush every 100ms
 
     // Setup stream data handler (Docker PTY -> WebSocket)
     const onData = (chunk: Buffer) => {
@@ -210,7 +229,16 @@ export class TerminalWebSocketHandler {
 
     // Setup stream end handler
     const onEnd = () => {
+      clearInterval(flushInterval);
       if (ws.readyState === WebSocket.OPEN) {
+        // Flush any remaining buffer
+        if (dataBuffer.trim()) {
+          const flushMessage: WebSocketMessage = {
+            type: 'stdout',
+            data: dataBuffer,
+          };
+          ws.send(JSON.stringify(flushMessage));
+        }
         const message: WebSocketMessage = {
           type: 'exit',
           code: 0,
@@ -257,6 +285,7 @@ export class TerminalWebSocketHandler {
     // Setup WebSocket close handler
     ws.on('close', () => {
       console.log(`WebSocket closed for session ${sessionId}`);
+      clearInterval(flushInterval);
       stream.removeListener('data', onData);
       stream.removeListener('end', onEnd);
       stream.removeListener('error', onError);
@@ -266,6 +295,7 @@ export class TerminalWebSocketHandler {
     // Setup WebSocket error handler
     ws.on('error', (error) => {
       console.error(`WebSocket error for session ${sessionId}:`, error);
+      clearInterval(flushInterval);
       stream.removeListener('data', onData);
       stream.removeListener('end', onEnd);
       stream.removeListener('error', onError);
