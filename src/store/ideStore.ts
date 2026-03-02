@@ -49,34 +49,10 @@ interface IDEStore {
   saveProject: () => Promise<void>;
 }
 
-const DEFAULT_PYTHON_CODE = `# 🐍 Python Editor | YaizY
-# Full Python with input(), loops, functions, and turtle graphics!
+const DEFAULT_PYTHON_CODE = `# Welcome to Python Editor!
+# Write your first Python code here
 
-print("=" * 50)
-print("🐢 TURTLE GRAPHICS - Рисуем спираль!")
-print("=" * 50)
-
-import turtle
-
-# Настройка
-turtle.speed(0)  # Максимальная скорость
-turtle.bgcolor("white")
-turtle.pensize(2)
-
-# Рисуем цветную спираль
-colors = ["red", "orange", "yellow", "green", "blue", "purple"]
-for i in range(36):
-    turtle.color(colors[i % 6])
-    turtle.forward(i * 4)
-    turtle.right(60)
-
-# Скрыть черепаху
-turtle.hideturtle()
-
-# Сохранить рисунок (автоматически сохраняет как PNG)
-turtle.done()
-
-print("\\n🎉 Готово! Проверьте терминал.")
+print("Hello, World!")
 `;
 
 export const useIDEStore = create<IDEStore>((set, get) => ({
