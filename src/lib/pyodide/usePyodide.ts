@@ -76,13 +76,13 @@ export function usePyodide(): UsePyodideReturn {
         // 2. async_input() - uses console field (new way!)
         
         // Sync version (старый способ)
-        pyodideInstance.globals.set('_browser_input', (prompt: string) => {
+        (pyodideInstance.globals as any).set('_browser_input', (prompt: string) => {
           // 1. Flush весь накопленный вывод в консоль ПЕРЕД prompt
           const stdout = pyodideInstance.runPython('_output_capture.get_stdout()');
           const stderr = pyodideInstance.runPython('_output_capture.get_stderr()');
           
           if (stdout) {
-            const lines = stdout.trim().split('\n');
+            const lines = String(stdout).trim().split('\n');
             lines.forEach((line: string) => {
               if (line) {
                 const event = new CustomEvent('python-stdout', {
@@ -94,7 +94,7 @@ export function usePyodide(): UsePyodideReturn {
           }
           
           if (stderr) {
-            const lines = stderr.trim().split('\n');
+            const lines = String(stderr).trim().split('\n');
             lines.forEach((line: string) => {
               if (line) {
                 const event = new CustomEvent('python-stderr', {
@@ -131,13 +131,13 @@ export function usePyodide(): UsePyodideReturn {
         // Async version (новый способ - через консоль!)
         (window as any)._inputResolve = null;
         
-        pyodideInstance.globals.set('_async_input', (prompt: string) => {
+        (pyodideInstance.globals as any).set('_async_input', (prompt: string) => {
           // 1. Flush вывод в консоль
           const stdout = pyodideInstance.runPython('_output_capture.get_stdout()');
           const stderr = pyodideInstance.runPython('_output_capture.get_stderr()');
           
           if (stdout) {
-            const lines = stdout.trim().split('\n');
+            const lines = String(stdout).trim().split('\n');
             lines.forEach((line: string) => {
               if (line) {
                 const event = new CustomEvent('python-stdout', {
@@ -149,7 +149,7 @@ export function usePyodide(): UsePyodideReturn {
           }
           
           if (stderr) {
-            const lines = stderr.trim().split('\n');
+            const lines = String(stderr).trim().split('\n');
             lines.forEach((line: string) => {
               if (line) {
                 const event = new CustomEvent('python-stderr', {

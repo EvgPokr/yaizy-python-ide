@@ -129,10 +129,10 @@ export const BackendLayout: React.FC = () => {
                 <FilePanel
                   files={project.files}
                   activeFileId={activeFile.id}
-                  onSelectFile={setActiveFile}
-                  onCreateFile={createFile}
-                  onDeleteFile={deleteFile}
-                  onRenameFile={renameFile}
+                  onFileSelect={setActiveFile}
+                  onFileCreate={createFile}
+                  onFileDelete={deleteFile}
+                  onFileRename={renameFile}
                 />
               </Panel>
               <PanelResizeHandle className="resize-handle" />
@@ -145,9 +145,8 @@ export const BackendLayout: React.FC = () => {
                 <span className="file-name">{activeFile.name}</span>
               </div>
               <Editor
-                value={activeFile.content}
+                content={activeFile.content}
                 onChange={(value) => updateFileContent(activeFile.id, value)}
-                language="python"
               />
             </div>
           </Panel>

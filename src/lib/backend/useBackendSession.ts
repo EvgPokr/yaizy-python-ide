@@ -12,7 +12,7 @@ export function useBackendSession() {
   const wsRef = useRef<TerminalWebSocket | null>(null);
   const isInitializedRef = useRef(false);
   const sessionIdRef = useRef<string | null>(null);
-  const runningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const runningTimeoutRef = useRef<any>(null);
 
   /**
    * Initialize session

@@ -26,7 +26,6 @@ export const Layout: React.FC<LayoutProps> = ({ pyodideStatus }) => {
     consoleLogs,
     currentError,
     runCode,
-    stopExecution,
     clearConsole,
   } = useIDEStore();
 

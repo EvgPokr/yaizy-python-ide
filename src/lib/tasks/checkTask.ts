@@ -53,7 +53,7 @@ function checkRequirement(
       return checkMaxLines(requirement, code);
     default:
       return {
-        requirementId: requirement.id,
+        requirementId: (requirement as any).id || 'unknown',
         passed: false,
         message: 'Unknown requirement type',
       };
