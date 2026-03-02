@@ -49,10 +49,7 @@ interface IDEStore {
   saveProject: () => Promise<void>;
 }
 
-const DEFAULT_PYTHON_CODE = `# Welcome to Python Editor!
-# Write your first Python code here
-
-print("Hello, World!")
+const DEFAULT_PYTHON_CODE = `# Write your first Python code
 `;
 
 export const useIDEStore = create<IDEStore>((set, get) => ({
