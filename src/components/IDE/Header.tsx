@@ -310,7 +310,7 @@ export const Header: React.FC<HeaderProps> = ({
                 title={user?.username || 'Profile'}
               >
                 <span className="profile-icon">👤</span>
-                <span className="profile-username">{user?.username}</span>
+                <span className="profile-username">{user?.username} ▾</span>
               </button>
               {showProfileDropdown && (
                 <ProfileDropdown onClose={() => setShowProfileDropdown(false)} />

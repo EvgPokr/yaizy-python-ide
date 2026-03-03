@@ -37,8 +37,8 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ onClose }) => 
   return (
     <div className="profile-dropdown" ref={dropdownRef}>
       <div className="profile-header">
-        <div className="profile-name">{user?.username}</div>
         {user?.full_name && <div className="profile-fullname">{user.full_name}</div>}
+        <div className="profile-name">{user?.username}</div>
       </div>
 
       <div className="dropdown-divider"></div>
@@ -48,6 +48,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ onClose }) => 
           <span className="item-icon">📁</span>
           <span>My Projects</span>
         </button>
+        <div className="dropdown-divider"></div>
         <button onClick={handleLogout} className="dropdown-item logout">
           <span className="item-icon">🚪</span>
           <span>Logout</span>
