@@ -4,6 +4,7 @@ import type { PyodideStatus } from '@/types';
 import { useAuthStore } from '@/store/authStore';
 import { useProjectMetaStore } from '@/store/projectMetaStore';
 import { useIDEStore } from '@/store/ideStore';
+import { projectsClient } from '@/lib/api/projectsClient';
 import { LoginDropdown } from '../Auth/LoginDropdown';
 import { ProfileDropdown } from '../Auth/ProfileDropdown';
 import { ShareButton } from '../Share/ShareButton';
@@ -29,9 +30,12 @@ export const Header: React.FC<HeaderProps> = ({
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
   const { projectMeta, updateIsPublic } = useProjectMetaStore();
-  const { project } = useIDEStore();
+  const { project, updateFileContent } = useIDEStore();
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showFileMenu, setShowFileMenu] = useState(false);
+  const [isEditingProjectName, setIsEditingProjectName] = useState(false);
+  const [editingName, setEditingName] = useState('');
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -41,8 +45,34 @@ export const Header: React.FC<HeaderProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       onImport(file);
-      // Сброс input для повторного импорта
       e.target.value = '';
+      setShowFileMenu(false);
+    }
+  };
+
+  const handleStartEditName = () => {
+    if (project) {
+      setEditingName(project.name);
+      setIsEditingProjectName(true);
+    }
+  };
+
+  const handleSaveProjectName = async () => {
+    if (!editingName.trim() || !projectMeta) {
+      setIsEditingProjectName(false);
+      return;
+    }
+
+    try {
+      await projectsClient.updateProject(projectMeta.id, editingName.trim());
+      // Update local project name
+      if (project) {
+        project.name = editingName.trim();
+      }
+      setIsEditingProjectName(false);
+    } catch (err: any) {
+      alert(err.message || 'Failed to rename project');
+      setIsEditingProjectName(false);
     }
   };
 
@@ -72,18 +102,95 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="ide-header">
       <div className="header-left">
-        <div className="header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} title="Go to home">
+        {/* Logo */}
+        <div className="header-logo" onClick={() => navigate('/')} title="Go to home">
           <span className="logo-brand">YaizY</span>
           <span className="logo-divider">|</span>
           <span className="logo-title">Python Editor</span>
         </div>
+
+        {/* File Menu */}
+        <div className="file-menu-container">
+          <button
+            className="file-menu-button"
+            onClick={() => setShowFileMenu(!showFileMenu)}
+          >
+            File ▾
+          </button>
+          {showFileMenu && (
+            <div className="file-menu-dropdown">
+              <button onClick={() => {
+                navigate('/projects');
+                setShowFileMenu(false);
+              }}>
+                <span className="menu-icon">📄</span>
+                New
+              </button>
+              <button onClick={() => {
+                handleImportClick();
+                setShowFileMenu(false);
+              }}>
+                <span className="menu-icon">📥</span>
+                Import
+              </button>
+              <button onClick={() => {
+                onExport();
+                setShowFileMenu(false);
+              }}>
+                <span className="menu-icon">📤</span>
+                Export
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Project Name (editable) */}
         {project && (
-          <div className="project-name-display">
-            <span className="project-name-label">Project:</span>
-            <span className="project-name-text">{project.name}</span>
+          <div className="project-name-container">
+            {isEditingProjectName ? (
+              <input
+                type="text"
+                value={editingName}
+                onChange={(e) => setEditingName(e.target.value)}
+                onBlur={handleSaveProjectName}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveProjectName();
+                  if (e.key === 'Escape') setIsEditingProjectName(false);
+                }}
+                className="project-name-input"
+                autoFocus
+              />
+            ) : (
+              <div
+                className="project-name-editable"
+                onClick={handleStartEditName}
+                title="Click to rename"
+              >
+                {project.name}
+              </div>
+            )}
           </div>
         )}
+
+        {/* Share Button */}
+        {projectMeta && isAuthenticated && (
+          <ShareButton
+            projectId={projectMeta.id}
+            projectName={projectMeta.name}
+            isPublic={projectMeta.is_public}
+            onUpdate={updateIsPublic}
+          />
+        )}
       </div>
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+      />
 
       <div className="header-center">
         <button
@@ -105,53 +212,6 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="button-icon">🗑️</span>
           <span className="button-text">Clear</span>
         </button>
-      </div>
-
-      <div className="header-right">
-        {/* New Project button - only when authenticated */}
-        {isAuthenticated && (
-          <button
-            className="header-button header-gradient-button"
-            onClick={() => navigate('/projects')}
-            title="Create new project"
-          >
-            + New Project
-          </button>
-        )}
-
-        {/* Share button - only show when editing saved project */}
-        {projectMeta && isAuthenticated && (
-          <ShareButton
-            projectId={projectMeta.id}
-            projectName={projectMeta.name}
-            isPublic={projectMeta.is_public}
-            onUpdate={updateIsPublic}
-          />
-        )}
-
-        <button
-          className="header-button header-gradient-button"
-          onClick={onExport}
-          title="Export project"
-        >
-          Export
-        </button>
-
-        <button
-          className="header-button header-gradient-button"
-          onClick={handleImportClick}
-          title="Import project"
-        >
-          Import
-        </button>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
-        />
 
         {pyodideStatus === 'loading' && (
           <div className="header-status">
@@ -159,22 +219,9 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Loading...</span>
           </div>
         )}
+      </div>
 
-        <button
-          className="header-button header-gradient-button help-button"
-          title="Keyboard shortcuts"
-          onClick={() => {
-            alert(
-              'Keyboard Shortcuts:\n\n' +
-                'Ctrl+Enter - Run code\n' +
-                'Esc - Clear console\n' +
-                'Ctrl+/ - Toggle comment'
-            );
-          }}
-        >
-          ?
-        </button>
-
+      <div className="header-right">
         {/* Auth button */}
         <div style={{ position: 'relative' }}>
           {!isAuthenticated ? (
@@ -193,11 +240,12 @@ export const Header: React.FC<HeaderProps> = ({
           ) : (
             <>
               <button
-                className="header-button profile-button"
+                className="header-button profile-button-extended"
                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                 title={user?.username || 'Profile'}
               >
                 <span className="profile-icon">👤</span>
+                <span className="profile-username">{user?.username}</span>
               </button>
               {showProfileDropdown && (
                 <ProfileDropdown onClose={() => setShowProfileDropdown(false)} />
