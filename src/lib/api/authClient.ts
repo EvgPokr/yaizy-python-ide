@@ -2,14 +2,19 @@
  * Auth API client
  */
 
-const API_BASE_URL = (import.meta as any).env?.VITE_BACKEND_URL || 
-  ((import.meta as any).env?.MODE === 'production' ? '' : 'http://localhost:3001');
+const API_BASE_URL =
+  (import.meta as any).env?.VITE_BACKEND_URL ||
+  ((import.meta as any).env?.MODE === 'production'
+    ? ''
+    : 'http://localhost:3001');
 
 export interface User {
   id: string;
   username: string;
   email?: string;
   full_name?: string;
+  grade?: string;
+  age?: number;
   role: string;
   created_at: number;
 }
@@ -55,11 +60,11 @@ class AuthClient {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
-    
+
     if (this.token) {
       headers['Authorization'] = `Bearer ${this.token}`;
     }
-    
+
     return headers;
   }
 
@@ -95,13 +100,27 @@ class AuthClient {
   /**
    * Register new user
    */
-  async register(username: string, password: string, fullName?: string, email?: string, captchaToken?: string): Promise<LoginResult> {
+  async register(
+    username: string,
+    password: string,
+    fullName?: string,
+    email?: string,
+    grade?: string,
+    age?: string
+  ): Promise<LoginResult> {
     const response = await fetch(`${this.baseUrl}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, password, fullName, email, captchaToken }),
+      body: JSON.stringify({
+        username,
+        password,
+        fullName,
+        email,
+        grade,
+        age: age ? parseInt(age) : undefined,
+      }),
     });
 
     if (!response.ok) {
@@ -110,7 +129,7 @@ class AuthClient {
     }
 
     const user: User = await response.json();
-    
+
     // Auto-login after registration
     return this.login(username, password);
   }

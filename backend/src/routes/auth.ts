@@ -47,13 +47,13 @@ router.get('/me', authMiddleware, (req: AuthRequest, res: Response) => {
  */
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { username, password, fullName, email } = req.body;
+    const { username, password, fullName, email, grade, age } = req.body;
 
     if (!username || !password) {
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    const user = await authService.register(username, password, fullName, email);
+    const user = await authService.register(username, password, fullName, email, grade, age);
     res.status(201).json(user);
   } catch (error: any) {
     console.error('Register error:', error);

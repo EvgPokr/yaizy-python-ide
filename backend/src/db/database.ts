@@ -26,6 +26,8 @@ export function initDatabase() {
       password_hash TEXT NOT NULL,
       email TEXT,
       full_name TEXT,
+      grade TEXT,
+      age INTEGER,
       role TEXT DEFAULT 'user',
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
@@ -62,6 +64,24 @@ export function initDatabase() {
       FOREIGN KEY (folder_id) REFERENCES folders(id) ON DELETE SET NULL
     )
   `);
+
+  // Migrate existing users table
+  try {
+    const userColumns = db.pragma('table_info(users)');
+    const userColumnNames = userColumns.map((col: any) => col.name);
+    
+    if (!userColumnNames.includes('grade')) {
+      console.log('Adding grade column to users table...');
+      db.exec('ALTER TABLE users ADD COLUMN grade TEXT');
+    }
+    
+    if (!userColumnNames.includes('age')) {
+      console.log('Adding age column to users table...');
+      db.exec('ALTER TABLE users ADD COLUMN age INTEGER');
+    }
+  } catch (error) {
+    console.error('User migration error:', error);
+  }
 
   // Migrate existing projects table
   try {

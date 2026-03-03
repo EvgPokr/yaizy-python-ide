@@ -12,13 +12,18 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [grade, setGrade] = useState('');
+  const [age, setAge] = useState('');
   const { login, register, isLoading, error, clearError } = useAuthStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         onClose();
       }
     };
@@ -35,7 +40,7 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
       if (mode === 'login') {
         await login(username, password);
       } else {
-        await register(username, password, fullName, email);
+        await register(username, password, fullName, email, grade, age);
       }
       onClose();
     } catch (err) {
@@ -61,11 +66,7 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
       </div>
 
       <form onSubmit={handleSubmit} className="dropdown-form">
-        {error && (
-          <div className="dropdown-error">
-            {error}
-          </div>
-        )}
+        {error && <div className="dropdown-error">{error}</div>}
 
         <div className="form-field">
           <input
@@ -107,11 +108,33 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
                 required
               />
             </div>
+            <div className="form-field">
+              <input
+                type="text"
+                value={grade}
+                onChange={(e) => setGrade(e.target.value)}
+                placeholder="Grade (optional)"
+              />
+            </div>
+            <div className="form-field">
+              <input
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="Age (optional)"
+                min="1"
+                max="120"
+              />
+            </div>
           </>
         )}
 
         <button type="submit" className="dropdown-submit" disabled={isLoading}>
-          {isLoading ? 'Processing...' : mode === 'login' ? 'Login' : 'Register'}
+          {isLoading
+            ? 'Processing...'
+            : mode === 'login'
+              ? 'Login'
+              : 'Register'}
         </button>
       </form>
     </div>
