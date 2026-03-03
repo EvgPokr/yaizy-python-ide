@@ -1,5 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import type { PyodideStatus } from '@/types';
+import { useAuthStore } from '@/store/authStore';
+import { LoginDropdown } from '../Auth/LoginDropdown';
+import { ProfileDropdown } from '../Auth/ProfileDropdown';
 
 interface HeaderProps {
   onRun: () => void;
@@ -19,6 +22,9 @@ export const Header: React.FC<HeaderProps> = ({
   pyodideStatus,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isAuthenticated, user } = useAuthStore();
+  const [showLoginDropdown, setShowLoginDropdown] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -134,6 +140,37 @@ export const Header: React.FC<HeaderProps> = ({
         >
           ?
         </button>
+
+        {/* Auth button */}
+        <div style={{ position: 'relative' }}>
+          {!isAuthenticated ? (
+            <>
+              <button
+                className="header-button login-button"
+                onClick={() => setShowLoginDropdown(!showLoginDropdown)}
+                title="Login"
+              >
+                Login
+              </button>
+              {showLoginDropdown && (
+                <LoginDropdown onClose={() => setShowLoginDropdown(false)} />
+              )}
+            </>
+          ) : (
+            <>
+              <button
+                className="header-button profile-button"
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                title={user?.username || 'Profile'}
+              >
+                <span className="profile-icon">👤</span>
+              </button>
+              {showProfileDropdown && (
+                <ProfileDropdown onClose={() => setShowProfileDropdown(false)} />
+              )}
+            </>
+          )}
+        </div>
       </div>
     </header>
   );
