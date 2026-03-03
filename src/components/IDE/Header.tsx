@@ -202,8 +202,8 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Project Name (editable) */}
-        {project && (
+        {/* Project Name (editable) - only show when authenticated */}
+        {project && isAuthenticated && (
           <div className="project-name-container">
             {isEditingProjectName ? (
               <input
