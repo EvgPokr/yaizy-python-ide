@@ -8,15 +8,17 @@ import { TerminalWebSocketHandler } from './websocket/terminal';
 import { handleCanvasWebSocket } from './websocket/canvas.js';
 import { createSessionRouter } from './routes/sessions';
 import { apiLimiter } from './middleware/rateLimit';
-import { initDatabase } from './db/database';
-import authRoutes from './routes/auth';
-import projectsRoutes from './routes/projects';
 
-// Load environment variables
+// Load environment variables FIRST
 dotenv.config();
 
-// Initialize database
+// Initialize database BEFORE importing auth/projects routes
+import { initDatabase } from './db/database';
 initDatabase();
+
+// Import auth routes AFTER database initialization
+import authRoutes from './routes/auth';
+import projectsRoutes from './routes/projects';
 
 class Server {
   private app: Express;
