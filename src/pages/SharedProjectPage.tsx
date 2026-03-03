@@ -5,6 +5,7 @@ import { BackendLayout } from '@/components/IDE/BackendLayout';
 import { useIDEStore } from '@/store/ideStore';
 import { useProjectMetaStore } from '@/store/projectMetaStore';
 import { useAuthStore } from '@/store/authStore';
+import { projectStorage } from '@/lib/storage/projectStorage';
 import './SharedProjectPage.css';
 
 export const SharedProjectPage: React.FC = () => {
@@ -89,17 +90,30 @@ export const SharedProjectPage: React.FC = () => {
       console.log('Guest mode fork');
       if (project) {
         try {
+          // Create forked project with new ID but keep all content
           const forkedProject = {
             ...project,
             id: `guest-${Date.now()}`,
             name: forkName,
+            // Keep all files with their content!
+            files: project.files.map(file => ({
+              ...file,
+              id: `file-${Date.now()}-${Math.random()}`,
+            })),
           };
           console.log('Forked project (guest):', forkedProject);
-          setReadOnly(false); // Disable read-only
+          
+          // Disable read-only and set the forked project
+          setReadOnly(false);
           setProject(forkedProject);
+          
+          // Save to localStorage
+          await projectStorage.save(forkedProject);
+          
+          // Close dialog and navigate
           setShowForkDialog(false);
           navigate('/');
-          alert('Project copied! You can now edit it. Login to save permanently.');
+          // No alert - just navigate!
         } catch (err: any) {
           console.error('Guest fork error:', err);
           alert('Failed to copy project: ' + err.message);
