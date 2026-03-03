@@ -484,6 +484,12 @@ body {
   flex: 1;
   overflow: hidden;
   min-height: 200px;
+  margin: 0 8px 8px 8px;
+}
+
+.terminal-wrapper .terminal-container {
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
 }
 
 .logo-divider {
