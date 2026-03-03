@@ -243,7 +243,10 @@ body {
 }
 
 .file-menu-button {
-  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
   background: var(--color-primary);
   border: none;
   border-radius: 8px;
@@ -259,6 +262,10 @@ body {
   background: var(--color-primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 168, 255, 0.3);
+}
+
+.file-menu-icon {
+  font-size: 16px;
 }
 
 .file-menu-dropdown {
@@ -313,7 +320,7 @@ body {
 }
 
 .project-name-editable {
-  padding: 10px 18px;
+  padding: 8px 16px;
   background: linear-gradient(135deg, rgba(0, 168, 255, 0.1) 0%, rgba(0, 168, 255, 0.05) 100%);
   border: 2px solid var(--color-primary);
   border-radius: 8px;
@@ -335,7 +342,7 @@ body {
 }
 
 .project-name-input {
-  padding: 10px 18px;
+  padding: 8px 16px;
   border: 2px solid var(--color-primary);
   border-radius: 8px;
   font-size: 14px;
@@ -354,8 +361,8 @@ body {
 .profile-button-extended {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
+  gap: 8px;
+  padding: 8px 16px;
   background: var(--color-secondary);
   color: white;
   border: none;
@@ -398,7 +405,6 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  color: white;
 }
 
 .run-control-button .button-icon {
@@ -407,6 +413,7 @@ body {
 
 .run-control-button .button-text {
   font-size: 14px;
+  color: white;
 }
 
 .run-control-button.run-button {
@@ -575,7 +582,7 @@ body {
 
 /* Login button */
 .login-button {
-  padding: 10px 18px;
+  padding: 8px 16px;
   background: var(--color-secondary);
   color: white;
   border: none;

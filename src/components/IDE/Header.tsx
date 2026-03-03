@@ -45,7 +45,6 @@ export const RunControls: React.FC<RunControlsProps> = ({ onRun, onClear, isRunn
         disabled={isRunning}
         title="Clear console (Esc)"
       >
-        <span className="button-icon">🗑️</span>
         <span className="button-text">Clear</span>
       </button>
       
@@ -156,6 +155,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="file-menu-button"
             onClick={() => setShowFileMenu(!showFileMenu)}
           >
+            <span className="file-menu-icon">📄</span>
             File ▾
           </button>
           {showFileMenu && (
