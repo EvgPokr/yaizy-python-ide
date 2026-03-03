@@ -116,6 +116,23 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  const handleNewProject = async () => {
+    if (!isAuthenticated) {
+      navigate('/projects');
+      return;
+    }
+
+    try {
+      // Create new project with "Untitled" name
+      const newProject = await projectsClient.createProject('Untitled', '', false);
+      
+      // Navigate to the new project's editor
+      navigate(`/editor/${newProject.id}`);
+    } catch (err: any) {
+      alert(err.message || 'Failed to create project');
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Ctrl+Enter для запуска
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -161,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
           {showFileMenu && (
             <div className="file-menu-dropdown">
               <button onClick={() => {
-                navigate('/projects');
+                handleNewProject();
                 setShowFileMenu(false);
               }}>
                 <span className="menu-icon">📄</span>
@@ -203,7 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
               />
             ) : (
               <div
-                className="project-name-editable"
+                className={`project-name-editable ${project.name === 'Untitled' ? 'untitled' : ''}`}
                 onClick={handleStartEditName}
                 title="Click to rename"
               >

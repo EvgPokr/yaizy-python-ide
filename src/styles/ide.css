@@ -337,6 +337,17 @@ body {
   color: var(--color-text);
 }
 
+.project-name-editable.untitled {
+  color: #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border-color: #ef4444;
+}
+
+.project-name-editable.untitled:hover {
+  border-color: #dc2626;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%);
+}
+
 .project-name-editable:hover {
   border-color: var(--color-primary-hover);
   background: linear-gradient(135deg, rgba(0, 168, 255, 0.15) 0%, rgba(0, 168, 255, 0.08) 100%);
