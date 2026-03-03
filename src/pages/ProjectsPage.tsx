@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { projectsClient, Project } from '@/lib/api/projectsClient';
 import { foldersClient, Folder } from '@/lib/api/foldersClient';
+import { ProfileDropdown } from '@/components/Auth/ProfileDropdown';
 import './ProjectsPage.css';
 
 export const ProjectsPage: React.FC = () => {
@@ -21,6 +22,7 @@ export const ProjectsPage: React.FC = () => {
   const [editingType, setEditingType] = useState<'project' | 'folder'>('project');
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [movingProjectId, setMovingProjectId] = useState<string | null>(null);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -137,6 +139,15 @@ export const ProjectsPage: React.FC = () => {
     navigate('/login');
   };
 
+  const handleNewProject = async () => {
+    try {
+      const newProject = await projectsClient.createProject('Untitled', '', false);
+      navigate(`/editor/${newProject.id}`);
+    } catch (err: any) {
+      alert(err.message || 'Failed to create project');
+    }
+  };
+
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -149,13 +160,30 @@ export const ProjectsPage: React.FC = () => {
     <div className="projects-page">
       <header className="projects-header">
         <div className="header-left">
-          <h1>My Projects</h1>
-          {user && <p className="user-info">Welcome, {user.full_name || user.username}!</p>}
+          <div className="header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} title="Go to home">
+            <span className="logo-brand">YaizY</span>
+            <span className="logo-divider">|</span>
+            <span className="logo-title">Python Editor</span>
+          </div>
+          <button className="new-project-button" onClick={handleNewProject}>
+            <span className="button-icon">+</span>
+            <span className="button-text">New Project</span>
+          </button>
         </div>
         <div className="header-right">
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
+          <div style={{ position: 'relative' }}>
+            <button
+              className="profile-button-extended"
+              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              title={user?.username || 'Profile'}
+            >
+              <span className="profile-icon">👤</span>
+              <span className="profile-username">{user?.username} ▾</span>
+            </button>
+            {showProfileDropdown && (
+              <ProfileDropdown onClose={() => setShowProfileDropdown(false)} />
+            )}
+          </div>
         </div>
       </header>
 

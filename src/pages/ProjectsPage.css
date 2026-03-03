@@ -1,47 +1,123 @@
 .projects-page {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: #f9fafb;
   display: flex;
   flex-direction: column;
 }
 
 .projects-header {
-  background: white;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 20px 40px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 var(--spacing-lg);
+  height: 60px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  gap: var(--spacing-md);
 }
 
-.header-left h1 {
-  margin: 0;
-  font-size: 24px;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 18px;
+  font-weight: 700;
+  height: 40px;
+  transition: opacity 0.2s;
+}
+
+.header-logo:hover {
+  opacity: 0.8;
+}
+
+.logo-brand {
+  font-size: 20px;
+  font-weight: 700;
+  color: #FF6600;
+  letter-spacing: -0.3px;
+}
+
+.logo-divider {
+  color: #ccc;
+  font-weight: 300;
+}
+
+.logo-title {
   color: #333;
-}
-
-.user-info {
-  margin: 5px 0 0 0;
-  color: #666;
-  font-size: 14px;
-}
-
-.logout-button {
-  padding: 10px 20px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
   font-weight: 500;
-  color: #666;
-  transition: all 0.2s;
 }
 
-.logout-button:hover {
-  background: #f5f5f5;
-  border-color: #ccc;
+.new-project-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #FF6600;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(255, 102, 0, 0.2);
+}
+
+.new-project-button:hover {
+  background: #FF5500;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 102, 0, 0.3);
+}
+
+.button-icon {
+  font-size: 16px;
+}
+
+.button-text {
+  font-size: 14px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.profile-button-extended {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #FF6600;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(255, 102, 0, 0.2);
+}
+
+.profile-button-extended:hover {
+  background: #FF5500;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 102, 0, 0.3);
+}
+
+.profile-username {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.profile-icon {
+  font-size: 16px;
 }
 
 .projects-container {
@@ -83,7 +159,7 @@
 .add-folder-button {
   width: 28px;
   height: 28px;
-  background: #667eea;
+  background: #00A8FF;
   color: white;
   border: none;
   border-radius: 6px;
@@ -96,7 +172,7 @@
 }
 
 .add-folder-button:hover {
-  background: #5568d3;
+  background: #0090DD;
   transform: scale(1.05);
 }
 
@@ -162,7 +238,7 @@
 }
 
 .folder-item.active {
-  background: #667eea;
+  background: #00A8FF;
   color: white;
 }
 
@@ -284,7 +360,7 @@
 
 .create-project-button {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #FF6600;
   color: white;
   border: none;
   border-radius: 8px;
@@ -292,11 +368,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(255, 102, 0, 0.2);
 }
 
 .create-project-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  background: #FF5500;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 102, 0, 0.3);
 }
 
 .create-project-form {
@@ -380,8 +458,9 @@
 }
 
 .project-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 168, 255, 0.15);
   transform: translateY(-2px);
+  border-color: #00A8FF;
 }
 
 .project-header {
