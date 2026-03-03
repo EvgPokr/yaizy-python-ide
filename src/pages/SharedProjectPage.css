@@ -23,18 +23,26 @@
 
 .shared-error button {
   padding: 10px 20px;
-  background: #667eea;
+  background: #00A8FF;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 168, 255, 0.2);
+}
+
+.shared-error button:hover {
+  background: #0090DD;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 168, 255, 0.3);
 }
 
 .shared-banner {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FF6600 0%, #00A8FF 100%);
   color: white;
-  padding: 12px 20px;
+  padding: 14px 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -47,20 +55,22 @@
 }
 
 .fork-banner-button {
-  padding: 8px 16px;
+  padding: 10px 20px;
   background: white;
-  color: #667eea;
+  color: #FF6600;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
 }
 
 .fork-banner-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.4);
+  background: #fffaf5;
 }
 
 .fork-dialog-overlay {
@@ -78,38 +88,47 @@
 
 .fork-dialog {
   background: white;
-  border-radius: 12px;
-  padding: 24px;
+  border-radius: 16px;
+  padding: 32px;
   width: 90%;
-  max-width: 400px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  max-width: 450px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  border: 2px solid #00A8FF;
 }
 
 .fork-dialog h3 {
-  margin: 0 0 8px 0;
-  font-size: 20px;
+  margin: 0 0 12px 0;
+  font-size: 22px;
+  font-weight: 700;
   color: #333;
+  background: linear-gradient(135deg, #FF6600 0%, #00A8FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .fork-dialog p {
-  margin: 0 0 20px 0;
+  margin: 0 0 24px 0;
   color: #666;
   font-size: 14px;
+  line-height: 1.6;
 }
 
 .fork-dialog input {
   width: 100%;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  margin-bottom: 20px;
   box-sizing: border-box;
+  transition: all 0.2s;
 }
 
 .fork-dialog input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #00A8FF;
+  box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.1);
 }
 
 .fork-dialog-actions {
@@ -119,23 +138,25 @@
 
 .fork-dialog-actions button {
   flex: 1;
-  padding: 12px;
+  padding: 14px;
   border: none;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .fork-dialog-actions button:first-child {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #FF6600;
   color: white;
+  box-shadow: 0 2px 4px rgba(255, 102, 0, 0.2);
 }
 
 .fork-dialog-actions button:first-child:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  background: #FF5500;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.4);
 }
 
 .fork-dialog-actions button:first-child:disabled {
@@ -144,20 +165,23 @@
 }
 
 .fork-dialog-actions button.cancel {
-  background: #f0f0f0;
-  color: #666;
+  background: #9ca3af;
+  color: white;
+  box-shadow: 0 2px 4px rgba(156, 163, 175, 0.2);
 }
 
 .fork-dialog-actions button.cancel:hover {
-  background: #e0e0e0;
+  background: #6b7280;
+  transform: translateY(-1px);
 }
 
 .fork-hint {
   margin: 16px 0 0 0;
-  padding: 12px;
-  background: #fff3cd;
-  border: 1px solid #ffd700;
-  border-radius: 6px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(255, 102, 0, 0.1) 0%, rgba(0, 168, 255, 0.1) 100%);
+  border: 1px solid #00A8FF;
+  border-radius: 8px;
   font-size: 13px;
-  color: #856404;
+  color: #666;
+  line-height: 1.5;
 }

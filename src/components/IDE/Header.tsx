@@ -225,14 +225,14 @@ export const Header: React.FC<HeaderProps> = ({
                 setShowFileMenu(false);
               }}>
                 <span className="menu-icon">📥</span>
-                Import
+                Load from your computer
               </button>
               <button onClick={() => {
                 onExport();
                 setShowFileMenu(false);
               }}>
                 <span className="menu-icon">📤</span>
-                Export
+                Save to your computer
               </button>
             </div>
           )}
