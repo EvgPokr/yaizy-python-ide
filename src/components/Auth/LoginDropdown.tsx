@@ -12,7 +12,7 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const { login, register, isLoading, error, clearError } = useAuthStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close on outside click
@@ -34,11 +34,10 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
     try {
       if (mode === 'login') {
         await login(username, password);
-        onClose();
       } else {
-        // Registration - not implemented yet
-        alert('Registration coming soon!');
+        await register(username, password, fullName, email);
       }
+      onClose();
     } catch (err) {
       // Error is already set in store
     }
