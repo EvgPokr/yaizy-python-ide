@@ -15,12 +15,13 @@ export const PythonIDEPage: React.FC = () => {
     setProject,
     initializeProject,
   } = useIDEStore();
-  const { setProjectMeta } = useProjectMetaStore();
+  const { setProjectMeta, setReadOnly } = useProjectMetaStore();
 
   // Load project from storage on mount
   useEffect(() => {
-    // Clear project metadata (guest mode has no saved project)
+    // Clear project metadata and disable read-only mode (guest mode)
     setProjectMeta(null);
+    setReadOnly(false);
     let mounted = true;
 
     async function loadProject() {

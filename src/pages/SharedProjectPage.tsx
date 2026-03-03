@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { projectsClient, Project } from '@/lib/api/projectsClient';
 import { BackendLayout } from '@/components/IDE/BackendLayout';
 import { useIDEStore } from '@/store/ideStore';
+import { useProjectMetaStore } from '@/store/projectMetaStore';
 import { useAuthStore } from '@/store/authStore';
 import './SharedProjectPage.css';
 
@@ -16,6 +17,7 @@ export const SharedProjectPage: React.FC = () => {
   const [forkName, setForkName] = useState('');
   const [isForking, setIsForking] = useState(false);
   const { setProject, project } = useIDEStore();
+  const { setReadOnly } = useProjectMetaStore();
 
   useEffect(() => {
     if (!projectId) {
@@ -23,7 +25,14 @@ export const SharedProjectPage: React.FC = () => {
       return;
     }
 
+    // Enable read-only mode
+    setReadOnly(true);
     loadPublicProject();
+
+    // Cleanup: disable read-only when leaving page
+    return () => {
+      setReadOnly(false);
+    };
   }, [projectId]);
 
   const loadPublicProject = async () => {
@@ -63,31 +72,53 @@ export const SharedProjectPage: React.FC = () => {
   };
 
   const handleFork = async () => {
-    if (!projectId) return;
+    console.log('Fork button clicked!', { projectId, isAuthenticated, forkName });
+    
+    if (!projectId) {
+      console.error('No projectId');
+      return;
+    }
+
+    if (!forkName.trim()) {
+      alert('Please enter a project name');
+      return;
+    }
 
     if (!isAuthenticated) {
       // Guest mode - just copy to LocalStorage
+      console.log('Guest mode fork');
       if (project) {
-        const forkedProject = {
-          ...project,
-          id: crypto.randomUUID(),
-          name: forkName || project.name,
-        };
-        setProject(forkedProject);
-        setShowForkDialog(false);
-        navigate('/');
-        alert('Project copied! You can now edit it. Login to save permanently.');
+        try {
+          const forkedProject = {
+            ...project,
+            id: `guest-${Date.now()}`,
+            name: forkName,
+          };
+          console.log('Forked project (guest):', forkedProject);
+          setReadOnly(false); // Disable read-only
+          setProject(forkedProject);
+          setShowForkDialog(false);
+          navigate('/');
+          alert('Project copied! You can now edit it. Login to save permanently.');
+        } catch (err: any) {
+          console.error('Guest fork error:', err);
+          alert('Failed to copy project: ' + err.message);
+        }
       }
       return;
     }
 
     // Authenticated - save to backend
+    console.log('Authenticated fork');
     setIsForking(true);
     try {
       const forkedProject = await projectsClient.forkProject(projectId, forkName);
+      console.log('Forked project (auth):', forkedProject);
       setShowForkDialog(false);
+      setReadOnly(false); // Disable read-only
       navigate(`/editor/${forkedProject.id}`);
     } catch (err: any) {
+      console.error('Fork error:', err);
       alert(err.message || 'Failed to fork project');
     } finally {
       setIsForking(false);

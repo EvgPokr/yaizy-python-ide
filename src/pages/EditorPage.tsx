@@ -23,6 +23,9 @@ export const EditorPage: React.FC = () => {
       return;
     }
 
+    // Disable read-only mode (this is user's own project)
+    setProjectMeta(null); // Will be set by loadProject
+    
     loadProject();
   }, [projectId]);
 

@@ -6,6 +6,7 @@ import { Editor } from './Editor';
 import { Terminal, clearTerminal } from '../Terminal/Terminal';
 import { CanvasPanel, CanvasPanelRef } from '../Canvas/CanvasPanel';
 import { useIDEStore } from '@/store/ideStore';
+import { useProjectMetaStore } from '@/store/projectMetaStore';
 import { projectStorage } from '@/lib/storage/projectStorage';
 import { useBackendSession } from '@/lib/backend/useBackendSession';
 
@@ -19,6 +20,8 @@ export const BackendLayout: React.FC = () => {
     deleteFile,
     renameFile,
   } = useIDEStore();
+  
+  const { isReadOnly } = useProjectMetaStore();
 
   const [showFilePanel, setShowFilePanel] = useState(true);
   const [canvasCollapsed, setCanvasCollapsed] = useState(false);
@@ -147,6 +150,7 @@ export const BackendLayout: React.FC = () => {
               <Editor
                 content={activeFile.content}
                 onChange={(value) => updateFileContent(activeFile.id, value)}
+                readOnly={isReadOnly}
               />
             </div>
           </Panel>

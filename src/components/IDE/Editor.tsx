@@ -7,6 +7,7 @@ interface EditorProps {
   onChange: (value: string) => void;
   errorLine?: number;
   errorColumn?: number;
+  readOnly?: boolean;
 }
 
 export const Editor: React.FC<EditorProps> = ({
@@ -14,6 +15,7 @@ export const Editor: React.FC<EditorProps> = ({
   onChange,
   errorLine,
   errorColumn,
+  readOnly = false,
 }) => {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const decorationsRef = useRef<string[]>([]);
@@ -36,6 +38,7 @@ export const Editor: React.FC<EditorProps> = ({
       renderLineHighlight: 'all',
       cursorBlinking: 'smooth',
       smoothScrolling: true,
+      readOnly,
     });
 
     // Фокус на редакторе
