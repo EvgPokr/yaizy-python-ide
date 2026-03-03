@@ -36,26 +36,15 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
     e.preventDefault();
     clearError();
 
-    // Check CAPTCHA for registration
-    if (mode === 'register' && !captchaToken) {
-      alert('Please complete the CAPTCHA');
-      return;
-    }
-
     try {
       if (mode === 'login') {
         await login(username, password);
       } else {
-        await register(username, password, fullName, email, captchaToken || undefined);
+        await register(username, password, fullName, email);
       }
       onClose();
     } catch (err) {
       // Error is already set in store
-      // Reset CAPTCHA on error
-      if (mode === 'register') {
-        recaptchaRef.current?.reset();
-        setCaptchaToken(null);
-      }
     }
   };
 
@@ -127,27 +116,12 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
                 required
               />
             </div>
-            
-            {/* reCAPTCHA */}
-            <div className="recaptcha-container">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={RECAPTCHA_SITE_KEY}
-                onChange={handleCaptchaChange}
-              />
-            </div>
           </>
         )}
 
-        <button type="submit" className="dropdown-submit" disabled={isLoading || (mode === 'register' && !captchaToken)}>
+        <button type="submit" className="dropdown-submit" disabled={isLoading}>
           {isLoading ? 'Processing...' : mode === 'login' ? 'Login' : 'Register'}
         </button>
-
-        {mode === 'login' && (
-          <div className="dropdown-hint">
-            Default: <strong>teacher</strong> / <strong>teacher123</strong>
-          </div>
-        )}
       </form>
     </div>
   );
