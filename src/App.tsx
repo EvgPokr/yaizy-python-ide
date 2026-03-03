@@ -4,6 +4,7 @@ import { useAuthStore } from './store/authStore';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { EditorPage } from './pages/EditorPage';
 import { PythonIDEPage } from './pages/PythonIDEPage';
+import { SharedProjectPage } from './pages/SharedProjectPage';
 
 // Protected route wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -50,6 +51,9 @@ export const App: React.FC = () => {
       <Routes>
         {/* Main editor - no auth required (guest mode) */}
         <Route path="/" element={<PythonIDEPage />} />
+        
+        {/* Shared project view - no auth required */}
+        <Route path="/share/:projectId" element={<SharedProjectPage />} />
         
         {/* Projects - requires auth */}
         <Route 

@@ -4,12 +4,14 @@ import { projectsClient, Project } from '@/lib/api/projectsClient';
 import { BackendLayout } from '@/components/IDE/BackendLayout';
 import { useIDEStore } from '@/store/ideStore';
 import { useProjectSync } from '@/hooks/useProjectSync';
+import { ShareButton } from '@/components/Share/ShareButton';
 
 export const EditorPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [backendProject, setBackendProject] = useState<Project | null>(null);
   const { setProject } = useIDEStore();
   
   // Enable auto-save
@@ -32,6 +34,7 @@ export const EditorPage: React.FC = () => {
 
     try {
       const project = await projectsClient.getProject(projectId);
+      setBackendProject(project);
       
       // Convert backend project format to IDE store format
       const ideProject = {
@@ -103,5 +106,28 @@ export const EditorPage: React.FC = () => {
     );
   }
 
-  return <BackendLayout />;
+  return (
+    <>
+      {backendProject && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          zIndex: 1000,
+        }}>
+          <ShareButton
+            projectId={backendProject.id}
+            projectName={backendProject.name}
+            isPublic={backendProject.is_public}
+            onUpdate={(isPublic) => {
+              if (backendProject) {
+                setBackendProject({ ...backendProject, is_public: isPublic });
+              }
+            }}
+          />
+        </div>
+      )}
+      <BackendLayout />
+    </>
+  );
 };
