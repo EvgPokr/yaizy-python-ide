@@ -233,7 +233,7 @@ body {
 .logo-brand {
   font-size: 20px;
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-secondary);
   letter-spacing: -0.3px;
 }
 
@@ -317,6 +317,8 @@ body {
   margin-left: var(--spacing-md);
   display: flex;
   align-items: center;
+  min-width: 200px;
+  max-width: 200px;
 }
 
 .project-name-editable {
@@ -328,7 +330,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  max-width: 250px;
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -347,8 +349,7 @@ body {
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  min-width: 200px;
-  max-width: 300px;
+  width: 100%;
   color: var(--color-text);
 }
 
@@ -602,27 +603,29 @@ body {
 
 /* Profile button */
 .profile-button {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  padding: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-secondary);
+  color: white;
   border: none;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(255, 102, 0, 0.2);
 }
 
 .profile-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  background: var(--color-secondary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 102, 0, 0.3);
 }
 
 .profile-icon {
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .button-icon {

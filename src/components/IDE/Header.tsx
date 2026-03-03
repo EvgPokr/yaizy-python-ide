@@ -239,7 +239,7 @@ export const Header: React.FC<HeaderProps> = ({
           {!isAuthenticated ? (
             <>
               <button
-                className="header-button login-button"
+                className="login-button"
                 onClick={() => setShowLoginDropdown(!showLoginDropdown)}
                 title="Login"
               >
@@ -252,7 +252,7 @@ export const Header: React.FC<HeaderProps> = ({
           ) : (
             <>
               <button
-                className="header-button profile-button-extended"
+                className="profile-button-extended"
                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                 title={user?.username || 'Profile'}
               >
