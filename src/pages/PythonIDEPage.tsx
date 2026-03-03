@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useIDEStore } from '@/store/ideStore';
+import { useProjectMetaStore } from '@/store/projectMetaStore';
 import { projectStorage } from '@/lib/storage/projectStorage';
 import { BackendLayout } from '@/components/IDE/BackendLayout';
 import '@/styles/ide.css';
@@ -14,9 +15,12 @@ export const PythonIDEPage: React.FC = () => {
     setProject,
     initializeProject,
   } = useIDEStore();
+  const { setProjectMeta } = useProjectMetaStore();
 
   // Load project from storage on mount
   useEffect(() => {
+    // Clear project metadata (guest mode has no saved project)
+    setProjectMeta(null);
     let mounted = true;
 
     async function loadProject() {

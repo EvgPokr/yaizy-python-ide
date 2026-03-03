@@ -1,8 +1,10 @@
 import React, { useRef, useState } from 'react';
 import type { PyodideStatus } from '@/types';
 import { useAuthStore } from '@/store/authStore';
+import { useProjectMetaStore } from '@/store/projectMetaStore';
 import { LoginDropdown } from '../Auth/LoginDropdown';
 import { ProfileDropdown } from '../Auth/ProfileDropdown';
+import { ShareButton } from '../Share/ShareButton';
 
 interface HeaderProps {
   onRun: () => void;
@@ -23,6 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isAuthenticated, user } = useAuthStore();
+  const { projectMeta, updateIsPublic } = useProjectMetaStore();
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
@@ -95,6 +98,16 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="header-right">
+        {/* Share button - only show when editing saved project */}
+        {projectMeta && isAuthenticated && (
+          <ShareButton
+            projectId={projectMeta.id}
+            projectName={projectMeta.name}
+            isPublic={projectMeta.is_public}
+            onUpdate={updateIsPublic}
+          />
+        )}
+
         <button
           className="header-button header-gradient-button"
           onClick={onExport}
