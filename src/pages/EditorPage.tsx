@@ -38,12 +38,12 @@ export const EditorPage: React.FC = () => {
           name: file.name,
           content: file.content,
           language: 'python' as const,
-          createdAt: file.created_at,
-          updatedAt: file.updated_at,
+          createdAt: new Date(file.created_at),
+          updatedAt: new Date(file.updated_at),
         })),
         activeFileId: project.files[0]?.id || '',
-        createdAt: project.created_at,
-        updatedAt: project.updated_at,
+        createdAt: new Date(project.created_at),
+        updatedAt: new Date(project.updated_at),
       };
 
       setProject(ideProject);
