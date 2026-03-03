@@ -47,6 +47,24 @@ export function initDatabase() {
     )
   `);
 
+  // Migrate existing projects table
+  try {
+    const columns = db.pragma('table_info(projects)');
+    const columnNames = columns.map((col: any) => col.name);
+    
+    if (!columnNames.includes('is_public')) {
+      console.log('Adding is_public column to projects table...');
+      db.exec('ALTER TABLE projects ADD COLUMN is_public INTEGER DEFAULT 0');
+    }
+    
+    if (!columnNames.includes('forked_from')) {
+      console.log('Adding forked_from column to projects table...');
+      db.exec('ALTER TABLE projects ADD COLUMN forked_from TEXT');
+    }
+  } catch (error) {
+    console.error('Migration error:', error);
+  }
+
   // Files table
   db.exec(`
     CREATE TABLE IF NOT EXISTS project_files (
