@@ -12,20 +12,19 @@
 
 .profile-header {
   padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #00A8FF 0%, #0090DD 100%);
   color: white;
 }
 
 .profile-name {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 4px;
 }
 
-.profile-role {
-  font-size: 12px;
+.profile-fullname {
+  font-size: 13px;
   opacity: 0.9;
-  text-transform: capitalize;
 }
 
 .dropdown-divider {
