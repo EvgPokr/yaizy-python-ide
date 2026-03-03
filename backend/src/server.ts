@@ -8,9 +8,15 @@ import { TerminalWebSocketHandler } from './websocket/terminal';
 import { handleCanvasWebSocket } from './websocket/canvas.js';
 import { createSessionRouter } from './routes/sessions';
 import { apiLimiter } from './middleware/rateLimit';
+import { initDatabase } from './db/database';
+import authRoutes from './routes/auth';
+import projectsRoutes from './routes/projects';
 
 // Load environment variables
 dotenv.config();
+
+// Initialize database
+initDatabase();
 
 class Server {
   private app: Express;
@@ -125,6 +131,8 @@ class Server {
     });
 
     // API routes
+    this.app.use('/api/auth', authRoutes);
+    this.app.use('/api/projects', projectsRoutes);
     this.app.use('/api/sessions', createSessionRouter(this.sessionManager));
 
     // 404 handler
