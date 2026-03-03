@@ -18,6 +18,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
   const [showDialog, setShowDialog] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [localIsPublic, setLocalIsPublic] = useState(isPublic);
+  const [copied, setCopied] = useState(false);
 
   const shareUrl = `${window.location.origin}/share/${projectId}`;
 
@@ -34,14 +35,20 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
     }
   };
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     if (!localIsPublic) {
       alert('Please make project public first to share it');
       return;
     }
 
-    navigator.clipboard.writeText(shareUrl);
-    alert('Link copied to clipboard!');
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      alert('Failed to copy link. Please copy manually.');
+    }
   };
 
   return (
@@ -86,8 +93,12 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
                     readOnly
                     onClick={(e) => (e.target as HTMLInputElement).select()}
                   />
-                  <button onClick={handleCopyLink}>
-                    Copy
+                  <button 
+                    onClick={handleCopyLink}
+                    className={copied ? 'copied' : ''}
+                    disabled={copied}
+                  >
+                    {copied ? '✓ Copied!' : 'Copy'}
                   </button>
                 </div>
               </div>

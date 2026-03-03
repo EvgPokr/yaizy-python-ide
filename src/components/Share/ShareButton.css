@@ -115,11 +115,38 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-width: 85px;
 }
 
 .share-link-input button:hover {
   background: #0090DD;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 168, 255, 0.3);
+}
+
+.share-link-input button.copied {
+  background: #4CAF50;
+  animation: copySuccess 0.5s ease;
+  cursor: default;
+}
+
+.share-link-input button:disabled {
+  cursor: default;
+}
+
+@keyframes copySuccess {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .share-dialog-actions {
