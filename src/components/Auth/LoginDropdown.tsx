@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { useAuthStore } from '@/store/authStore';
 import './LoginDropdown.css';
 
@@ -7,18 +6,14 @@ interface LoginDropdownProps {
   onClose: () => void;
 }
 
-const RECAPTCHA_SITE_KEY = (import.meta as any).env?.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'; // Test key
-
 export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const { login, register, isLoading, error, clearError } = useAuthStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Close on outside click
   useEffect(() => {
@@ -46,10 +41,6 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
     } catch (err) {
       // Error is already set in store
     }
-  };
-
-  const handleCaptchaChange = (token: string | null) => {
-    setCaptchaToken(token);
   };
 
   return (
