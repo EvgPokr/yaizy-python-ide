@@ -118,12 +118,49 @@ export const Header: React.FC<HeaderProps> = ({
 
   const handleNewProject = async () => {
     if (!isAuthenticated) {
-      navigate('/projects');
+      // Guest mode: confirm before creating new project
+      const confirmed = window.confirm(
+        'Creating a new project will replace your current work. Are you sure you want to continue?'
+      );
+      
+      if (!confirmed) {
+        return;
+      }
+      
+      // Create new empty project in localStorage and reload
+      const { projectStorage } = await import('@/lib/storage/projectStorage');
+      
+      const generateId = () => Math.random().toString(36).substring(2) + Date.now().toString(36);
+      
+      const newProject = {
+        id: generateId(),
+        name: 'Untitled Project',
+        files: [
+          {
+            id: generateId(),
+            name: 'main.py',
+            content: '# Write your first Python code\n',
+            language: 'python' as const,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+        activeFileId: '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      newProject.activeFileId = newProject.files[0].id;
+      
+      await projectStorage.save(newProject);
+      
+      // Reload the page to show new project
+      window.location.href = '/';
       return;
     }
 
     try {
-      // Create new project with "Untitled" name
+      // Authenticated: Create new project with "Untitled" name
       const newProject = await projectsClient.createProject('Untitled', '', false);
       
       // Navigate to the new project's editor
