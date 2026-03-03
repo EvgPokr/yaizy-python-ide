@@ -3,8 +3,8 @@
 ## Overview
 
 This update adds project sharing and forking functionality:
-- Teachers can make projects public and share links
-- Students can view and fork (copy) shared projects
+- Users can make projects public and share links
+- Anyone can view and fork (copy) shared projects
 - Works with or without login (guest mode)
 
 ---
@@ -57,7 +57,7 @@ journalctl -u python-ide-backend -f
 
 ### 2. Check Frontend
 - Open your website
-- Login as teacher
+- Login with any account
 - Open a project
 - You should see **"🔗 Share"** button in top-right
 

@@ -18,7 +18,7 @@ db.pragma('foreign_keys = ON');
 export function initDatabase() {
   console.log('Initializing database...');
   
-  // Users table (teachers)
+  // Users table
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -26,7 +26,7 @@ export function initDatabase() {
       password_hash TEXT NOT NULL,
       email TEXT,
       full_name TEXT,
-      role TEXT DEFAULT 'teacher',
+      role TEXT DEFAULT 'user',
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     )
@@ -78,20 +78,20 @@ export function initDatabase() {
     )
   `);
 
-  // Create default teacher account if not exists
-  const defaultUser = db.prepare('SELECT id FROM users WHERE username = ?').get('teacher');
+  // Create default demo account if not exists
+  const defaultUser = db.prepare('SELECT id FROM users WHERE username = ?').get('demo');
   if (!defaultUser) {
     const bcrypt = require('bcrypt');
-    const defaultPassword = bcrypt.hashSync('teacher123', 10);
+    const defaultPassword = bcrypt.hashSync('demo123', 10);
     const userId = require('uuid').v4();
     const now = Date.now();
     
     db.prepare(`
       INSERT INTO users (id, username, password_hash, full_name, role, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(userId, 'teacher', defaultPassword, 'Default Teacher', 'teacher', now, now);
+    `).run(userId, 'demo', defaultPassword, 'Demo User', 'user', now, now);
     
-    console.log('✅ Default teacher account created (username: teacher, password: teacher123)');
+    console.log('✅ Default demo account created (username: demo, password: demo123)');
   }
 
   console.log('✅ Database initialized');

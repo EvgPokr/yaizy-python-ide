@@ -2,13 +2,13 @@
 
 ## Overview
 
-Teachers can now share their Python projects with students! Students can view the shared code and create their own copy (fork) to edit.
+Users can now share their Python projects with others! Anyone can view shared code and create their own copy (fork) to edit.
 
 ---
 
 ## 📚 How it Works
 
-### For Teachers (Project Owners)
+### For Project Owners (Sharing Your Work)
 
 1. **Create a Project**
    - Login to your account
@@ -19,20 +19,20 @@ Teachers can now share their Python projects with students! Students can view th
    - Click the **"🔗 Share"** button (top-right corner in editor)
    - Toggle **"Make project public"** checkbox
    - Copy the share link
-   - Share the link with your students!
+   - Share the link with anyone!
 
 3. **What Happens?**
-   - Students can view your code (read-only)
-   - Students can fork (copy) the project to edit their own version
+   - Others can view your code (read-only)
+   - Others can fork (copy) the project to edit their own version
    - Your original project remains unchanged
 
 ---
 
-### For Students
+### For Other Users (Viewing Shared Projects)
 
 #### Option 1: With Account (Recommended)
 1. **View Shared Project**
-   - Open the share link from your teacher
+   - Open the share link
    - You'll see the code in read-only mode
 
 2. **Fork the Project**
@@ -44,7 +44,7 @@ Teachers can now share their Python projects with students! Students can view th
 3. **Your Fork is Saved**
    - Your forked project is saved in your account
    - Access it anytime from "My Projects"
-   - Make changes without affecting the teacher's version
+   - Make changes without affecting the original version
 
 #### Option 2: Without Account (Guest Mode)
 1. **View and Fork**
@@ -61,19 +61,19 @@ Teachers can now share their Python projects with students! Students can view th
 
 ## 🎯 Use Cases
 
-### 1. Homework Assignments
+### 1. Collaborative Learning
 ```
-Teacher creates project → Shares link → Students fork & complete
+User creates project → Shares link → Others fork & collaborate
 ```
 
 ### 2. Code Templates
 ```
-Teacher creates starter code → Students fork → Modify for their needs
+User creates starter code → Others fork → Modify for their needs
 ```
 
 ### 3. Examples & Demos
 ```
-Teacher shares working examples → Students fork → Experiment safely
+User shares working examples → Others fork → Experiment safely
 ```
 
 ---
@@ -89,13 +89,13 @@ Teacher shares working examples → Students fork → Experiment safely
 
 ## 💡 Pro Tips
 
-### For Teachers:
+### For Project Owners:
 - Make projects public only when ready to share
 - Use descriptive project names
-- Add comments in code to guide students
+- Add comments in code to guide others
 - You can see "forked_from" in database if needed
 
-### For Students:
+### For Everyone:
 - Login before forking to save your work!
 - Give your fork a unique name
 - Original project link still works after forking
@@ -104,7 +104,7 @@ Teacher shares working examples → Students fork → Experiment safely
 
 ## 🚀 Example Workflow
 
-1. **Teacher creates "Python Basics - Lesson 1"**
+1. **User creates "Python Basics Example"**
    ```python
    # TODO: Complete this function
    def greet(name):
@@ -112,20 +112,20 @@ Teacher shares working examples → Students fork → Experiment safely
        pass
    ```
 
-2. **Teacher clicks Share → Makes public → Copies link**
+2. **User clicks Share → Makes public → Copies link**
    ```
    https://your-domain.com/share/abc-123-def
    ```
 
-3. **Student opens link → Sees task → Clicks Fork**
+3. **Another user opens link → Sees code → Clicks Fork**
 
-4. **Student completes in their fork:**
+4. **They complete it in their fork:**
    ```python
    def greet(name):
        return f"Hello, {name}!"
    ```
 
-5. **Student's work is saved in their account!**
+5. **Their work is saved in their account!**
 
 ---
 
@@ -145,8 +145,8 @@ Teacher shares working examples → Students fork → Experiment safely
 
 ## ❓ FAQ
 
-**Q: Can students edit my original project?**  
-A: No! Shared projects are read-only. Students can only fork (copy) them.
+**Q: Can others edit my original project?**  
+A: No! Shared projects are read-only. Others can only fork (copy) them.
 
 **Q: How many people can fork my project?**  
 A: Unlimited! Each fork is independent.
@@ -193,7 +193,7 @@ projects (
 
 1. **Clear Instructions**: Add comments in shared code
 2. **Test First**: Run the code before sharing
-3. **Descriptive Names**: Help students identify the assignment
+3. **Descriptive Names**: Help others understand the project
 4. **Version Control**: Keep a "template" version and a "working" version
 5. **Privacy**: Only share when ready - check code for sensitive info
 
