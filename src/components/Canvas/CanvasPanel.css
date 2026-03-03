@@ -149,13 +149,21 @@
   flex: 0 0 auto;
   height: auto;
   min-height: 0;
+  max-height: 44px;
   overflow: hidden;
 }
 
 .canvas-panel.collapsed .canvas-content {
   display: none;
+  height: 0;
 }
 
 .canvas-panel.collapsed .canvas-header {
   border-bottom: none;
+}
+
+.canvas-panel:not(.collapsed) {
+  flex: 0 1 auto;
+  min-height: 200px;
+  max-height: 60vh;
 }

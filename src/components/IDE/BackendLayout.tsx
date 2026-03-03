@@ -158,39 +158,25 @@ export const BackendLayout: React.FC = () => {
           <PanelResizeHandle className="resize-handle" />
 
           <Panel defaultSize={30} minSize={20}>
-            <PanelGroup direction="vertical">
-              <Panel 
-                defaultSize={canvasCollapsed ? 5 : 50} 
-                minSize={canvasCollapsed ? 5 : 20}
-                maxSize={canvasCollapsed ? 5 : 70}
-              >
-                <div className="canvas-with-controls">
-                  <RunControls
-                    onRun={handleRun}
-                    onClear={handleClear}
-                    isRunning={isRunning}
-                    pyodideStatus={isConnected ? 'ready' : 'loading'}
-                  />
-                  <CanvasPanel 
-                    ref={canvasPanelRef}
-                    sessionId={sessionId} 
-                    onCollapsedChange={setCanvasCollapsed}
-                  />
-                </div>
-              </Panel>
-
-              {!canvasCollapsed && <PanelResizeHandle className="resize-handle" />}
-
-              <Panel 
-                defaultSize={canvasCollapsed ? 95 : 50} 
-                minSize={30}
-              >
+            <div className="right-panel-container">
+              <RunControls
+                onRun={handleRun}
+                onClear={handleClear}
+                isRunning={isRunning}
+                pyodideStatus={isConnected ? 'ready' : 'loading'}
+              />
+              <CanvasPanel 
+                ref={canvasPanelRef}
+                sessionId={sessionId} 
+                onCollapsedChange={setCanvasCollapsed}
+              />
+              <div className="terminal-wrapper">
                 <Terminal
                   onData={sendInput}
                   onResize={resize}
                 />
-              </Panel>
-            </PanelGroup>
+              </div>
+            </div>
           </Panel>
         </PanelGroup>
       </div>

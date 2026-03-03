@@ -465,16 +465,25 @@ body {
   color: var(--color-text-secondary);
 }
 
-.canvas-with-controls {
+.right-panel-container {
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
 }
 
-.canvas-with-controls .canvas-container {
+.right-panel-container > .run-controls {
+  flex-shrink: 0;
+}
+
+.right-panel-container > .canvas-panel {
+  flex-shrink: 0;
+}
+
+.right-panel-container > .terminal-wrapper {
   flex: 1;
   overflow: hidden;
+  min-height: 200px;
 }
 
 .logo-divider {
