@@ -39,6 +39,8 @@ export const EditorPage: React.FC = () => {
           content: file.content,
         })),
         activeFileId: project.files[0]?.id || '',
+        createdAt: project.created_at,
+        updatedAt: project.updated_at,
       };
 
       setProject(ideProject);
