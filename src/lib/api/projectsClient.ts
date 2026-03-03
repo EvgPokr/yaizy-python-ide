@@ -20,6 +20,8 @@ export interface Project {
   user_id: string;
   name: string;
   description?: string;
+  is_public: boolean;
+  forked_from?: string;
   files: ProjectFile[];
   created_at: number;
   updated_at: number;
@@ -65,7 +67,7 @@ class ProjectsClient {
   }
 
   /**
-   * Get single project
+   * Get single project (user's own)
    */
   async getProject(id: string): Promise<Project> {
     const response = await fetch(`${this.baseUrl}/api/projects/${id}`, {
@@ -81,13 +83,45 @@ class ProjectsClient {
   }
 
   /**
+   * Get public project (no auth required)
+   */
+  async getPublicProject(id: string): Promise<Project> {
+    const response = await fetch(`${this.baseUrl}/api/projects/public/${id}`);
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Project not found or not public');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Fork project (create copy)
+   */
+  async forkProject(id: string, newName?: string): Promise<Project> {
+    const response = await fetch(`${this.baseUrl}/api/projects/fork/${id}`, {
+      method: 'POST',
+      headers: this.getAuthHeader(),
+      body: JSON.stringify({ name: newName }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fork project');
+    }
+
+    return response.json();
+  }
+
+  /**
    * Create project
    */
-  async createProject(name: string, description?: string): Promise<Project> {
+  async createProject(name: string, description?: string, isPublic: boolean = false): Promise<Project> {
     const response = await fetch(`${this.baseUrl}/api/projects`, {
       method: 'POST',
       headers: this.getAuthHeader(),
-      body: JSON.stringify({ name, description }),
+      body: JSON.stringify({ name, description, isPublic }),
     });
 
     if (!response.ok) {
@@ -101,11 +135,11 @@ class ProjectsClient {
   /**
    * Update project
    */
-  async updateProject(id: string, name?: string, description?: string): Promise<Project> {
+  async updateProject(id: string, name?: string, description?: string, isPublic?: boolean): Promise<Project> {
     const response = await fetch(`${this.baseUrl}/api/projects/${id}`, {
       method: 'PUT',
       headers: this.getAuthHeader(),
-      body: JSON.stringify({ name, description }),
+      body: JSON.stringify({ name, description, isPublic }),
     });
 
     if (!response.ok) {

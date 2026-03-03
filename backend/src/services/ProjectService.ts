@@ -14,6 +14,8 @@ export interface Project {
   user_id: string;
   name: string;
   description?: string;
+  is_public: boolean;
+  forked_from?: string;
   files: ProjectFile[];
   created_at: number;
   updated_at: number;
@@ -25,7 +27,7 @@ export class ProjectService {
    */
   getUserProjects(userId: string): Project[] {
     const projects = db.prepare(`
-      SELECT id, user_id, name, description, created_at, updated_at
+      SELECT id, user_id, name, description, is_public, forked_from, created_at, updated_at
       FROM projects
       WHERE user_id = ?
       ORDER BY updated_at DESC
@@ -33,16 +35,17 @@ export class ProjectService {
 
     return projects.map(project => ({
       ...project,
+      is_public: Boolean(project.is_public),
       files: this.getProjectFiles(project.id),
     }));
   }
 
   /**
-   * Get single project by ID
+   * Get single project by ID (user's own project)
    */
   getProject(projectId: string, userId: string): Project | null {
     const project = db.prepare(`
-      SELECT id, user_id, name, description, created_at, updated_at
+      SELECT id, user_id, name, description, is_public, forked_from, created_at, updated_at
       FROM projects
       WHERE id = ? AND user_id = ?
     `).get(projectId, userId) as any;
@@ -51,6 +54,26 @@ export class ProjectService {
 
     return {
       ...project,
+      is_public: Boolean(project.is_public),
+      files: this.getProjectFiles(projectId),
+    };
+  }
+
+  /**
+   * Get public project by ID (anyone can view)
+   */
+  getPublicProject(projectId: string): Project | null {
+    const project = db.prepare(`
+      SELECT id, user_id, name, description, is_public, forked_from, created_at, updated_at
+      FROM projects
+      WHERE id = ? AND is_public = 1
+    `).get(projectId) as any;
+
+    if (!project) return null;
+
+    return {
+      ...project,
+      is_public: Boolean(project.is_public),
       files: this.getProjectFiles(projectId),
     };
   }
@@ -58,14 +81,14 @@ export class ProjectService {
   /**
    * Create new project
    */
-  createProject(userId: string, name: string, description?: string): Project {
+  createProject(userId: string, name: string, description?: string, isPublic: boolean = false): Project {
     const projectId = uuidv4();
     const now = Date.now();
 
     db.prepare(`
-      INSERT INTO projects (id, user_id, name, description, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(projectId, userId, name, description || null, now, now);
+      INSERT INTO projects (id, user_id, name, description, is_public, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(projectId, userId, name, description || null, isPublic ? 1 : 0, now, now);
 
     // Create default main.py file
     const fileId = uuidv4();
@@ -80,7 +103,7 @@ export class ProjectService {
   /**
    * Update project
    */
-  updateProject(projectId: string, userId: string, name?: string, description?: string): Project | null {
+  updateProject(projectId: string, userId: string, name?: string, description?: string, isPublic?: boolean): Project | null {
     const project = this.getProject(projectId, userId);
     if (!project) return null;
 
@@ -96,6 +119,10 @@ export class ProjectService {
       updates.push('description = ?');
       params.push(description);
     }
+    if (isPublic !== undefined) {
+      updates.push('is_public = ?');
+      params.push(isPublic ? 1 : 0);
+    }
 
     if (updates.length > 0) {
       updates.push('updated_at = ?');
@@ -109,6 +136,44 @@ export class ProjectService {
     }
 
     return this.getProject(projectId, userId);
+  }
+
+  /**
+   * Fork project (create a copy)
+   */
+  forkProject(sourceProjectId: string, userId: string, newName?: string): Project {
+    // Get source project (either own or public)
+    let sourceProject = this.getProject(sourceProjectId, userId);
+    if (!sourceProject) {
+      sourceProject = this.getPublicProject(sourceProjectId);
+    }
+    
+    if (!sourceProject) {
+      throw new Error('Project not found or not accessible');
+    }
+
+    const projectId = uuidv4();
+    const now = Date.now();
+    const projectName = newName || `${sourceProject.name} (copy)`;
+
+    // Create forked project
+    db.prepare(`
+      INSERT INTO projects (id, user_id, name, description, is_public, forked_from, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(projectId, userId, projectName, sourceProject.description || null, 0, sourceProjectId, now, now);
+
+    // Copy all files
+    for (const file of sourceProject.files) {
+      const fileId = uuidv4();
+      db.prepare(`
+        INSERT INTO project_files (id, project_id, name, content, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(fileId, projectId, file.name, file.content, now, now);
+    }
+
+    console.log(`✅ Project ${sourceProjectId} forked to ${projectId} by user ${userId}`);
+
+    return this.getProject(projectId, userId)!;
   }
 
   /**

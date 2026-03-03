@@ -1,17 +1,31 @@
-import { Router, Response } from 'express';
+import { Router, Response, Request } from 'express';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { projectService } from '../services/ProjectService';
 
 const router = Router();
 
-// All routes require authentication
-router.use(authMiddleware);
+/**
+ * GET /api/projects/public/:id
+ * Get public project (no auth required)
+ */
+router.get('/public/:id', (req: Request, res: Response) => {
+  try {
+    const project = projectService.getPublicProject(req.params.id);
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found or not public' });
+    }
+    res.json(project);
+  } catch (error: any) {
+    console.error('Get public project error:', error);
+    res.status(500).json({ error: error.message || 'Failed to get project' });
+  }
+});
 
 /**
  * GET /api/projects
  * Get all projects for current user
  */
-router.get('/', (req: AuthRequest, res: Response) => {
+router.get('/', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
     const projects = projectService.getUserProjects(req.userId!);
     res.json(projects);
@@ -25,7 +39,7 @@ router.get('/', (req: AuthRequest, res: Response) => {
  * GET /api/projects/:id
  * Get single project
  */
-router.get('/:id', (req: AuthRequest, res: Response) => {
+router.get('/:id', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
     const project = projectService.getProject(req.params.id, req.userId!);
     if (!project) {
@@ -39,18 +53,33 @@ router.get('/:id', (req: AuthRequest, res: Response) => {
 });
 
 /**
+ * POST /api/projects/fork/:id
+ * Fork a project (create copy)
+ */
+router.post('/fork/:id', authMiddleware, (req: AuthRequest, res: Response) => {
+  try {
+    const { name } = req.body;
+    const project = projectService.forkProject(req.params.id, req.userId!, name);
+    res.status(201).json(project);
+  } catch (error: any) {
+    console.error('Fork project error:', error);
+    res.status(500).json({ error: error.message || 'Failed to fork project' });
+  }
+});
+
+/**
  * POST /api/projects
  * Create new project
  */
-router.post('/', (req: AuthRequest, res: Response) => {
+router.post('/', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, isPublic } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Project name is required' });
     }
 
-    const project = projectService.createProject(req.userId!, name, description);
+    const project = projectService.createProject(req.userId!, name, description, isPublic);
     res.status(201).json(project);
   } catch (error: any) {
     console.error('Create project error:', error);
@@ -62,10 +91,10 @@ router.post('/', (req: AuthRequest, res: Response) => {
  * PUT /api/projects/:id
  * Update project
  */
-router.put('/:id', (req: AuthRequest, res: Response) => {
+router.put('/:id', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
-    const { name, description } = req.body;
-    const project = projectService.updateProject(req.params.id, req.userId!, name, description);
+    const { name, description, isPublic } = req.body;
+    const project = projectService.updateProject(req.params.id, req.userId!, name, description, isPublic);
     
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
@@ -82,7 +111,7 @@ router.put('/:id', (req: AuthRequest, res: Response) => {
  * DELETE /api/projects/:id
  * Delete project
  */
-router.delete('/:id', (req: AuthRequest, res: Response) => {
+router.delete('/:id', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
     const success = projectService.deleteProject(req.params.id, req.userId!);
     
@@ -101,7 +130,7 @@ router.delete('/:id', (req: AuthRequest, res: Response) => {
  * POST /api/projects/:id/files
  * Add file to project
  */
-router.post('/:id/files', (req: AuthRequest, res: Response) => {
+router.post('/:id/files', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
     const { name, content } = req.body;
 
@@ -126,7 +155,7 @@ router.post('/:id/files', (req: AuthRequest, res: Response) => {
  * PUT /api/projects/:projectId/files/:fileId
  * Update file content
  */
-router.put('/:projectId/files/:fileId', (req: AuthRequest, res: Response) => {
+router.put('/:projectId/files/:fileId', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
     const { content } = req.body;
 
@@ -151,7 +180,7 @@ router.put('/:projectId/files/:fileId', (req: AuthRequest, res: Response) => {
  * PATCH /api/projects/:projectId/files/:fileId
  * Rename file
  */
-router.patch('/:projectId/files/:fileId', (req: AuthRequest, res: Response) => {
+router.patch('/:projectId/files/:fileId', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
     const { name } = req.body;
 
@@ -176,7 +205,7 @@ router.patch('/:projectId/files/:fileId', (req: AuthRequest, res: Response) => {
  * DELETE /api/projects/:projectId/files/:fileId
  * Delete file
  */
-router.delete('/:projectId/files/:fileId', (req: AuthRequest, res: Response) => {
+router.delete('/:projectId/files/:fileId', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
     const success = projectService.deleteFile(req.params.fileId, req.params.projectId, req.userId!);
     
