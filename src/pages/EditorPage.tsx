@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { projectsClient, Project } from '@/lib/api/projectsClient';
 import { BackendLayout } from '@/components/IDE/BackendLayout';
 import { useIDEStore } from '@/store/ideStore';
+import { useProjectSync } from '@/hooks/useProjectSync';
 
 export const EditorPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -10,6 +11,9 @@ export const EditorPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { setProject } = useIDEStore();
+  
+  // Enable auto-save
+  useProjectSync();
 
   useEffect(() => {
     if (!projectId) {
