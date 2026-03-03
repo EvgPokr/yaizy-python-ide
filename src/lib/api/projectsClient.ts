@@ -20,6 +20,7 @@ export interface Project {
   user_id: string;
   name: string;
   description?: string;
+  folder_id?: string | null;
   is_public: boolean;
   forked_from?: string;
   files: ProjectFile[];
@@ -135,11 +136,11 @@ class ProjectsClient {
   /**
    * Update project
    */
-  async updateProject(id: string, name?: string, description?: string, isPublic?: boolean): Promise<Project> {
+  async updateProject(id: string, name?: string, description?: string, isPublic?: boolean, folderId?: string | null): Promise<Project> {
     const response = await fetch(`${this.baseUrl}/api/projects/${id}`, {
       method: 'PUT',
       headers: this.getAuthHeader(),
-      body: JSON.stringify({ name, description, isPublic }),
+      body: JSON.stringify({ name, description, isPublic, folderId }),
     });
 
     if (!response.ok) {

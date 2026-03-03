@@ -19,6 +19,7 @@ initDatabase();
 // Import auth routes AFTER database initialization
 import authRoutes from './routes/auth';
 import projectsRoutes from './routes/projects';
+import foldersRoutes from './routes/folders';
 
 class Server {
   private app: Express;
@@ -134,6 +135,7 @@ class Server {
 
     // API routes
     this.app.use('/api/auth', authRoutes);
+    this.app.use('/api/folders', foldersRoutes);
     this.app.use('/api/projects', projectsRoutes);
     this.app.use('/api/sessions', createSessionRouter(this.sessionManager));
 

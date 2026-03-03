@@ -93,8 +93,8 @@ router.post('/', authMiddleware, (req: AuthRequest, res: Response) => {
  */
 router.put('/:id', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
-    const { name, description, isPublic } = req.body;
-    const project = projectService.updateProject(req.params.id, req.userId!, name, description, isPublic);
+    const { name, description, isPublic, folderId } = req.body;
+    const project = projectService.updateProject(req.params.id, req.userId!, name, description, isPublic, folderId);
     
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });

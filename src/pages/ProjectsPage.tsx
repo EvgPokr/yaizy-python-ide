@@ -2,31 +2,42 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { projectsClient, Project } from '@/lib/api/projectsClient';
+import { foldersClient, Folder } from '@/lib/api/foldersClient';
 import './ProjectsPage.css';
 
 export const ProjectsPage: React.FC = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
+  const [newFolderName, setNewFolderName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  const [editingType, setEditingType] = useState<'project' | 'folder'>('project');
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [movingProjectId, setMovingProjectId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadProjects();
+    loadData();
   }, []);
 
-  const loadProjects = async () => {
+  const loadData = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await projectsClient.getProjects();
-      setProjects(data);
+      const [projectsData, foldersData] = await Promise.all([
+        projectsClient.getProjects(),
+        foldersClient.getFolders(),
+      ]);
+      setProjects(projectsData);
+      setFolders(foldersData);
     } catch (err: any) {
-      setError(err.message || 'Failed to load projects');
+      setError(err.message || 'Failed to load data');
     } finally {
       setIsLoading(false);
     }
@@ -40,9 +51,23 @@ export const ProjectsPage: React.FC = () => {
       await projectsClient.createProject(newProjectName.trim());
       setNewProjectName('');
       setIsCreating(false);
-      await loadProjects();
+      await loadData();
     } catch (err: any) {
       alert(err.message || 'Failed to create project');
+    }
+  };
+
+  const handleCreateFolder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newFolderName.trim()) return;
+
+    try {
+      await foldersClient.createFolder(newFolderName.trim());
+      setNewFolderName('');
+      setIsCreatingFolder(false);
+      await loadData();
+    } catch (err: any) {
+      alert(err.message || 'Failed to create folder');
     }
   };
 
@@ -51,18 +76,22 @@ export const ProjectsPage: React.FC = () => {
     navigate(`/editor/${project.id}`);
   };
 
-  const handleRenameProject = async (id: string) => {
+  const handleRename = async (id: string) => {
     if (!editingName.trim()) {
       setEditingId(null);
       return;
     }
 
     try {
-      await projectsClient.updateProject(id, editingName.trim());
+      if (editingType === 'project') {
+        await projectsClient.updateProject(id, editingName.trim());
+      } else {
+        await foldersClient.updateFolder(id, editingName.trim());
+      }
       setEditingId(null);
-      await loadProjects();
+      await loadData();
     } catch (err: any) {
-      alert(err.message || 'Failed to rename project');
+      alert(err.message || `Failed to rename ${editingType}`);
     }
   };
 
@@ -71,11 +100,37 @@ export const ProjectsPage: React.FC = () => {
 
     try {
       await projectsClient.deleteProject(id);
-      await loadProjects();
+      await loadData();
     } catch (err: any) {
       alert(err.message || 'Failed to delete project');
     }
   };
+
+  const handleDeleteFolder = async (id: string, name: string) => {
+    if (!confirm(`Delete folder "${name}"? Projects inside will be moved to root.`)) return;
+
+    try {
+      await foldersClient.deleteFolder(id);
+      await loadData();
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete folder');
+    }
+  };
+
+  const handleMoveProject = async (projectId: string, folderId: string | null) => {
+    try {
+      await projectsClient.updateProject(projectId, undefined, undefined, undefined, folderId);
+      setMovingProjectId(null);
+      await loadData();
+    } catch (err: any) {
+      alert(err.message || 'Failed to move project');
+    }
+  };
+
+  // Get projects in selected folder
+  const visibleProjects = selectedFolder
+    ? projects.filter(p => p.folder_id === selectedFolder)
+    : projects.filter(p => !p.folder_id);
 
   const handleLogout = () => {
     logout();
@@ -108,104 +163,245 @@ export const ProjectsPage: React.FC = () => {
         {error && (
           <div className="error-message">
             {error}
-            <button onClick={loadProjects}>Retry</button>
+            <button onClick={loadData}>Retry</button>
           </div>
         )}
 
-        <div className="projects-actions">
-          {!isCreating ? (
-            <button 
-              onClick={() => setIsCreating(true)} 
-              className="create-project-button"
-            >
-              + New Project
-            </button>
-          ) : (
-            <form onSubmit={handleCreateProject} className="create-project-form">
-              <input
-                type="text"
-                value={newProjectName}
-                onChange={(e) => setNewProjectName(e.target.value)}
-                placeholder="Enter project name..."
-                autoFocus
-              />
-              <button type="submit">Create</button>
-              <button type="button" onClick={() => {
-                setIsCreating(false);
-                setNewProjectName('');
-              }}>
-                Cancel
-              </button>
-            </form>
-          )}
-        </div>
+        <div className="projects-layout">
+          {/* Sidebar with folders */}
+          <div className="folders-sidebar">
+            <div className="sidebar-header">
+              <h3>Folders</h3>
+              {!isCreatingFolder ? (
+                <button onClick={() => setIsCreatingFolder(true)} className="add-folder-button" title="New folder">
+                  +
+                </button>
+              ) : null}
+            </div>
 
-        {isLoading ? (
-          <div className="loading">Loading projects...</div>
-        ) : projects.length === 0 ? (
-          <div className="empty-state">
-            <p>No projects yet</p>
-            <p className="empty-hint">Create your first project to get started</p>
-          </div>
-        ) : (
-          <div className="projects-grid">
-            {projects.map((project) => (
-              <div key={project.id} className="project-card">
-                {editingId === project.id ? (
-                  <div className="project-edit">
+            {isCreatingFolder && (
+              <form onSubmit={handleCreateFolder} className="folder-form">
+                <input
+                  type="text"
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  placeholder="Folder name..."
+                  autoFocus
+                />
+                <div className="folder-form-actions">
+                  <button type="submit" title="Create">✓</button>
+                  <button type="button" onClick={() => {
+                    setIsCreatingFolder(false);
+                    setNewFolderName('');
+                  }} title="Cancel">✕</button>
+                </div>
+              </form>
+            )}
+
+            <div className="folders-list">
+              <div
+                className={`folder-item ${selectedFolder === null ? 'active' : ''}`}
+                onClick={() => setSelectedFolder(null)}
+              >
+                <span className="folder-icon">📁</span>
+                <span className="folder-name">All Projects</span>
+                <span className="folder-count">({projects.filter(p => !p.folder_id).length})</span>
+              </div>
+
+              {folders.map(folder => (
+                <div
+                  key={folder.id}
+                  className={`folder-item ${selectedFolder === folder.id ? 'active' : ''}`}
+                >
+                  {editingId === folder.id && editingType === 'folder' ? (
                     <input
                       type="text"
                       value={editingName}
                       onChange={(e) => setEditingName(e.target.value)}
-                      onBlur={() => handleRenameProject(project.id)}
+                      onBlur={() => handleRename(folder.id)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleRenameProject(project.id);
+                        if (e.key === 'Enter') handleRename(folder.id);
                         if (e.key === 'Escape') setEditingId(null);
                       }}
                       autoFocus
+                      className="folder-edit-input"
                     />
-                  </div>
-                ) : (
-                  <>
-                    <div className="project-header">
-                      <h3 onClick={() => handleOpenProject(project)}>
-                        {project.name}
-                      </h3>
-                      <div className="project-actions">
+                  ) : (
+                    <>
+                      <div className="folder-main" onClick={() => setSelectedFolder(folder.id)}>
+                        <span className="folder-icon">📂</span>
+                        <span className="folder-name">{folder.name}</span>
+                        <span className="folder-count">({projects.filter(p => p.folder_id === folder.id).length})</span>
+                      </div>
+                      <div className="folder-actions">
                         <button
-                          onClick={() => {
-                            setEditingId(project.id);
-                            setEditingName(project.name);
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingId(folder.id);
+                            setEditingName(folder.name);
+                            setEditingType('folder');
                           }}
                           title="Rename"
                         >
                           ✎
                         </button>
                         <button
-                          onClick={() => handleDeleteProject(project.id, project.name)}
-                          className="delete-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteFolder(folder.id, folder.name);
+                          }}
                           title="Delete"
                         >
                           ✕
                         </button>
                       </div>
-                    </div>
-                    <div className="project-meta">
-                      <span>{project.files.length} file(s)</span>
-                      <span>Updated {formatDate(project.updated_at)}</span>
-                    </div>
-                    <button
-                      onClick={() => handleOpenProject(project)}
-                      className="open-button"
-                    >
-                      Open
-                    </button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Main content area */}
+          <div className="projects-main">
+            <div className="projects-actions">
+              <div className="breadcrumb">
+                {selectedFolder ? (
+                  <>
+                    <span onClick={() => setSelectedFolder(null)} className="breadcrumb-link">All Projects</span>
+                    <span className="breadcrumb-separator">/</span>
+                    <span>{folders.find(f => f.id === selectedFolder)?.name}</span>
                   </>
+                ) : (
+                  <span>All Projects</span>
                 )}
               </div>
-            ))}
+
+              {!isCreating ? (
+                <button 
+                  onClick={() => setIsCreating(true)} 
+                  className="create-project-button"
+                >
+                  + New Project
+                </button>
+              ) : (
+                <form onSubmit={handleCreateProject} className="create-project-form">
+                  <input
+                    type="text"
+                    value={newProjectName}
+                    onChange={(e) => setNewProjectName(e.target.value)}
+                    placeholder="Enter project name..."
+                    autoFocus
+                  />
+                  <button type="submit">Create</button>
+                  <button type="button" onClick={() => {
+                    setIsCreating(false);
+                    setNewProjectName('');
+                  }}>
+                    Cancel
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {isLoading ? (
+              <div className="loading">Loading projects...</div>
+            ) : visibleProjects.length === 0 ? (
+              <div className="empty-state">
+                <p>No projects in this folder</p>
+                <p className="empty-hint">Create a project or move one here</p>
+              </div>
+            ) : (
+              <div className="projects-grid">
+                {visibleProjects.map((project) => (
+                  <div key={project.id} className="project-card">
+                    {editingId === project.id && editingType === 'project' ? (
+                      <div className="project-edit">
+                        <input
+                          type="text"
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          onBlur={() => handleRename(project.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleRename(project.id);
+                            if (e.key === 'Escape') setEditingId(null);
+                          }}
+                          autoFocus
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div className="project-header">
+                          <h3 onClick={() => handleOpenProject(project)}>
+                            {project.name}
+                            {project.is_public && <span className="public-badge">🌐</span>}
+                          </h3>
+                          <div className="project-actions">
+                            <button
+                              onClick={() => setMovingProjectId(project.id)}
+                              title="Move to folder"
+                            >
+                              📁
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingId(project.id);
+                                setEditingName(project.name);
+                                setEditingType('project');
+                              }}
+                              title="Rename"
+                            >
+                              ✎
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProject(project.id, project.name)}
+                              className="delete-button"
+                              title="Delete"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                        <div className="project-meta">
+                          <span>{project.files.length} file(s)</span>
+                          <span>Updated {formatDate(project.updated_at)}</span>
+                        </div>
+                        <button
+                          onClick={() => handleOpenProject(project)}
+                          className="open-button"
+                        >
+                          Open
+                        </button>
+
+                        {/* Move to folder dialog */}
+                        {movingProjectId === project.id && (
+                          <div className="move-dialog" onClick={(e) => e.stopPropagation()}>
+                            <p>Move to:</p>
+                            <button onClick={() => handleMoveProject(project.id, null)}>
+                              📁 Root (No folder)
+                            </button>
+                            {folders.map(folder => (
+                              <button
+                                key={folder.id}
+                                onClick={() => handleMoveProject(project.id, folder.id)}
+                                disabled={folder.id === project.folder_id}
+                              >
+                                📂 {folder.name}
+                              </button>
+                            ))}
+                            <button onClick={() => setMovingProjectId(null)} className="cancel">
+                              Cancel
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

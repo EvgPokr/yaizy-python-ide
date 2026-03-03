@@ -14,6 +14,7 @@ export interface Project {
   user_id: string;
   name: string;
   description?: string;
+  folder_id?: string | null;
   is_public: boolean;
   forked_from?: string;
   files: ProjectFile[];
@@ -25,16 +26,31 @@ export class ProjectService {
   /**
    * Get all projects for a user
    */
-  getUserProjects(userId: string): Project[] {
-    const projects = db.prepare(`
-      SELECT id, user_id, name, description, is_public, forked_from, created_at, updated_at
+  getUserProjects(userId: string, folderId?: string | null): Project[] {
+    let query = `
+      SELECT id, user_id, name, description, folder_id, is_public, forked_from, created_at, updated_at
       FROM projects
       WHERE user_id = ?
-      ORDER BY updated_at DESC
-    `).all(userId) as any[];
+    `;
+    
+    const params: any[] = [userId];
+    
+    if (folderId !== undefined) {
+      if (folderId === null) {
+        query += ' AND folder_id IS NULL';
+      } else {
+        query += ' AND folder_id = ?';
+        params.push(folderId);
+      }
+    }
+    
+    query += ' ORDER BY updated_at DESC';
+    
+    const projects = db.prepare(query).all(...params) as any[];
 
     return projects.map(project => ({
       ...project,
+      folder_id: project.folder_id || null,
       is_public: Boolean(project.is_public),
       files: this.getProjectFiles(project.id),
     }));
@@ -45,7 +61,7 @@ export class ProjectService {
    */
   getProject(projectId: string, userId: string): Project | null {
     const project = db.prepare(`
-      SELECT id, user_id, name, description, is_public, forked_from, created_at, updated_at
+      SELECT id, user_id, name, description, folder_id, is_public, forked_from, created_at, updated_at
       FROM projects
       WHERE id = ? AND user_id = ?
     `).get(projectId, userId) as any;
@@ -54,6 +70,7 @@ export class ProjectService {
 
     return {
       ...project,
+      folder_id: project.folder_id || null,
       is_public: Boolean(project.is_public),
       files: this.getProjectFiles(projectId),
     };
@@ -103,7 +120,7 @@ export class ProjectService {
   /**
    * Update project
    */
-  updateProject(projectId: string, userId: string, name?: string, description?: string, isPublic?: boolean): Project | null {
+  updateProject(projectId: string, userId: string, name?: string, description?: string, isPublic?: boolean, folderId?: string | null): Project | null {
     const project = this.getProject(projectId, userId);
     if (!project) return null;
 
@@ -122,6 +139,10 @@ export class ProjectService {
     if (isPublic !== undefined) {
       updates.push('is_public = ?');
       params.push(isPublic ? 1 : 0);
+    }
+    if (folderId !== undefined) {
+      updates.push('folder_id = ?');
+      params.push(folderId || null);
     }
 
     if (updates.length > 0) {

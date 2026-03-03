@@ -32,6 +32,20 @@ export function initDatabase() {
     )
   `);
 
+  // Folders table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS folders (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      parent_id TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
+    )
+  `);
+
   // Projects table
   db.exec(`
     CREATE TABLE IF NOT EXISTS projects (
@@ -39,11 +53,13 @@ export function initDatabase() {
       user_id TEXT NOT NULL,
       name TEXT NOT NULL,
       description TEXT,
+      folder_id TEXT,
       is_public INTEGER DEFAULT 0,
       forked_from TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (folder_id) REFERENCES folders(id) ON DELETE SET NULL
     )
   `);
 
@@ -60,6 +76,11 @@ export function initDatabase() {
     if (!columnNames.includes('forked_from')) {
       console.log('Adding forked_from column to projects table...');
       db.exec('ALTER TABLE projects ADD COLUMN forked_from TEXT');
+    }
+    
+    if (!columnNames.includes('folder_id')) {
+      console.log('Adding folder_id column to projects table...');
+      db.exec('ALTER TABLE projects ADD COLUMN folder_id TEXT');
     }
   } catch (error) {
     console.error('Migration error:', error);

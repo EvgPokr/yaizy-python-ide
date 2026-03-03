@@ -47,9 +47,214 @@
 .projects-container {
   flex: 1;
   padding: 40px;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+}
+
+.projects-layout {
+  display: flex;
+  gap: 24px;
+  height: 100%;
+}
+
+.folders-sidebar {
+  width: 250px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  height: fit-content;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.add-folder-button {
+  width: 28px;
+  height: 28px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-folder-button:hover {
+  background: #5568d3;
+  transform: scale(1.05);
+}
+
+.folder-form {
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.folder-form input {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.folder-form-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.folder-form-actions button {
+  flex: 1;
+  padding: 6px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.folder-form-actions button[type="submit"] {
+  background: #667eea;
+  color: white;
+}
+
+.folder-form-actions button[type="button"] {
+  background: #e0e0e0;
+  color: #666;
+}
+
+.folders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.folder-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.folder-item:hover {
+  background: #f5f5f5;
+}
+
+.folder-item.active {
+  background: #667eea;
+  color: white;
+}
+
+.folder-item.active .folder-icon {
+  filter: brightness(2);
+}
+
+.folder-item.active .folder-count {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.folder-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.folder-icon {
+  font-size: 16px;
+}
+
+.folder-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.folder-count {
+  font-size: 12px;
+  color: #999;
+}
+
+.folder-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.folder-item:hover .folder-actions {
+  opacity: 1;
+}
+
+.folder-actions button {
+  background: #e0e0e0;
+  border: none;
+  border-radius: 3px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-actions button:hover {
+  background: #d0d0d0;
+}
+
+.folder-edit-input {
+  width: 100%;
+  padding: 6px;
+  border: 2px solid #667eea;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.projects-main {
+  flex: 1;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.breadcrumb-link {
+  color: #667eea;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.breadcrumb-separator {
+  margin: 0 8px;
+  color: #ccc;
 }
 
 .error-message {
@@ -258,4 +463,61 @@
 .open-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.public-badge {
+  margin-left: 8px;
+  font-size: 14px;
+}
+
+.move-dialog {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.move-dialog p {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+}
+
+.move-dialog button {
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.move-dialog button:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #667eea;
+}
+
+.move-dialog button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.move-dialog button.cancel {
+  background: #f0f0f0;
+  color: #666;
+  font-weight: 600;
+  margin-top: 6px;
 }
