@@ -99,3 +99,10 @@
 .dropdown-hint strong {
   color: #667eea;
 }
+
+.recaptcha-container {
+  display: flex;
+  justify-content: center;
+  transform: scale(0.9);
+  transform-origin: center;
+}

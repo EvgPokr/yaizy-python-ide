@@ -95,13 +95,13 @@ class AuthClient {
   /**
    * Register new user
    */
-  async register(username: string, password: string, fullName?: string, email?: string): Promise<LoginResult> {
+  async register(username: string, password: string, fullName?: string, email?: string, captchaToken?: string): Promise<LoginResult> {
     const response = await fetch(`${this.baseUrl}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, password, fullName, email }),
+      body: JSON.stringify({ username, password, fullName, email, captchaToken }),
     });
 
     if (!response.ok) {

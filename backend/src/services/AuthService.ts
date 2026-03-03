@@ -101,13 +101,40 @@ export class AuthService {
   }
 
   /**
-   * Register new user (for future use)
+   * Register new user
    */
   async register(username: string, password: string, fullName?: string, email?: string): Promise<User> {
+    // Validate username
+    if (username.length < 3) {
+      throw new Error('Username must be at least 3 characters');
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      throw new Error('Username can only contain letters, numbers and underscore');
+    }
+
+    // Validate password
+    if (password.length < 6) {
+      throw new Error('Password must be at least 6 characters');
+    }
+
     // Check if username exists
-    const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
-    if (existing) {
+    const existingUsername = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+    if (existingUsername) {
       throw new Error('Username already exists');
+    }
+
+    // Check if email exists (if provided)
+    if (email) {
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        throw new Error('Invalid email format');
+      }
+
+      const existingEmail = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+      if (existingEmail) {
+        throw new Error('Email already registered');
+      }
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -118,6 +145,8 @@ export class AuthService {
       INSERT INTO users (id, username, password_hash, full_name, email, role, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `).run(userId, username, passwordHash, fullName || null, email || null, 'teacher', now, now);
+
+    console.log(`✅ New user registered: ${username}`);
 
     return {
       id: userId,

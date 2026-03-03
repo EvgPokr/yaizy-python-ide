@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useAuthStore } from '@/store/authStore';
 import './LoginDropdown.css';
 
@@ -6,14 +7,18 @@ interface LoginDropdownProps {
   onClose: () => void;
 }
 
+const RECAPTCHA_SITE_KEY = (import.meta as any).env?.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'; // Test key
+
 export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const { login, register, isLoading, error, clearError } = useAuthStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   // Close on outside click
   useEffect(() => {
@@ -31,16 +36,31 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
     e.preventDefault();
     clearError();
 
+    // Check CAPTCHA for registration
+    if (mode === 'register' && !captchaToken) {
+      alert('Please complete the CAPTCHA');
+      return;
+    }
+
     try {
       if (mode === 'login') {
         await login(username, password);
       } else {
-        await register(username, password, fullName, email);
+        await register(username, password, fullName, email, captchaToken || undefined);
       }
       onClose();
     } catch (err) {
       // Error is already set in store
+      // Reset CAPTCHA on error
+      if (mode === 'register') {
+        recaptchaRef.current?.reset();
+        setCaptchaToken(null);
+      }
     }
+  };
+
+  const handleCaptchaChange = (token: string | null) => {
+    setCaptchaToken(token);
   };
 
   return (
@@ -103,13 +123,23 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email (optional)"
+                placeholder="Email"
+                required
+              />
+            </div>
+            
+            {/* reCAPTCHA */}
+            <div className="recaptcha-container">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={RECAPTCHA_SITE_KEY}
+                onChange={handleCaptchaChange}
               />
             </div>
           </>
         )}
 
-        <button type="submit" className="dropdown-submit" disabled={isLoading}>
+        <button type="submit" className="dropdown-submit" disabled={isLoading || (mode === 'register' && !captchaToken)}>
           {isLoading ? 'Processing...' : mode === 'login' ? 'Login' : 'Register'}
         </button>
 

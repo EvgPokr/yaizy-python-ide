@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { authService } from '../services/AuthService';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
+import { captchaService } from '../services/CaptchaService';
 
 const router = Router();
 
@@ -43,14 +44,24 @@ router.get('/me', authMiddleware, (req: AuthRequest, res: Response) => {
 
 /**
  * POST /api/auth/register
- * Register new user (optional - for future use)
+ * Register new user with CAPTCHA verification
  */
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { username, password, fullName, email } = req.body;
+    const { username, password, fullName, email, captchaToken } = req.body;
 
     if (!username || !password) {
       return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    // Verify CAPTCHA if token provided
+    if (captchaToken) {
+      const clientIp = req.ip || req.socket.remoteAddress;
+      const isValidCaptcha = await captchaService.verify(captchaToken, clientIp);
+      
+      if (!isValidCaptcha) {
+        return res.status(400).json({ error: 'CAPTCHA verification failed. Please try again.' });
+      }
     }
 
     const user = await authService.register(username, password, fullName, email);
