@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useProjectMetaStore } from '@/store/projectMetaStore';
 import { useIDEStore } from '@/store/ideStore';
 import { projectsClient } from '@/lib/api/projectsClient';
+import { projectStorage } from '@/lib/storage/projectStorage';
 import { LoginDropdown } from '../Auth/LoginDropdown';
 import { ProfileDropdown } from '../Auth/ProfileDropdown';
 import { ShareButton } from '../Share/ShareButton';
@@ -128,8 +129,6 @@ export const Header: React.FC<HeaderProps> = ({
       }
       
       // Create new empty project in localStorage and reload
-      const { projectStorage } = await import('@/lib/storage/projectStorage');
-      
       const generateId = () => Math.random().toString(36).substring(2) + Date.now().toString(36);
       
       const newProject = {
