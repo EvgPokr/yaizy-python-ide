@@ -204,8 +204,8 @@ body {
   justify-content: space-between;
   height: var(--header-height);
   padding: 0 var(--spacing-md);
-  background: white;
-  border-bottom: 2px solid var(--color-primary);
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
   gap: var(--spacing-md);
 }
 
