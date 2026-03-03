@@ -12,7 +12,7 @@
 
 .profile-header {
   padding: 16px;
-  background: #00A8FF;
+  background: linear-gradient(135deg, #FF6600 0%, #00A8FF 100%);
   color: white;
 }
 

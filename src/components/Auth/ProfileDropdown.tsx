@@ -50,7 +50,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ onClose }) => 
         </button>
         <div className="dropdown-divider"></div>
         <button onClick={handleLogout} className="dropdown-item logout">
-          <span className="item-icon">🚪</span>
+          <span className="item-icon">←</span>
           <span>Logout</span>
         </button>
       </div>
