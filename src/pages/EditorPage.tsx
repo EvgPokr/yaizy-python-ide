@@ -37,7 +37,7 @@ export const EditorPage: React.FC = () => {
           id: file.id,
           name: file.name,
           content: file.content,
-          language: 'python',
+          language: 'python' as const,
           createdAt: file.created_at,
           updatedAt: file.updated_at,
         })),
