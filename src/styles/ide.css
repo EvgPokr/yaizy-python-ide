@@ -224,6 +224,11 @@ body {
   font-size: 18px;
   font-weight: 700;
   height: 40px;
+  transition: opacity 0.2s;
+}
+
+.header-logo:hover {
+  opacity: 0.8;
 }
 
 .logo-brand {
@@ -231,6 +236,30 @@ body {
   font-weight: 700;
   color: #FF6B35;
   letter-spacing: -0.3px;
+}
+
+.project-name-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-left: var(--spacing-lg);
+  padding-left: var(--spacing-lg);
+  border-left: 2px solid var(--color-border);
+  font-size: 14px;
+}
+
+.project-name-label {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.project-name-text {
+  color: var(--color-text);
+  font-weight: 600;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .logo-divider {

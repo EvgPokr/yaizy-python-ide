@@ -1,7 +1,9 @@
 import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { PyodideStatus } from '@/types';
 import { useAuthStore } from '@/store/authStore';
 import { useProjectMetaStore } from '@/store/projectMetaStore';
+import { useIDEStore } from '@/store/ideStore';
 import { LoginDropdown } from '../Auth/LoginDropdown';
 import { ProfileDropdown } from '../Auth/ProfileDropdown';
 import { ShareButton } from '../Share/ShareButton';
@@ -24,8 +26,10 @@ export const Header: React.FC<HeaderProps> = ({
   pyodideStatus,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
   const { projectMeta, updateIsPublic } = useProjectMetaStore();
+  const { project } = useIDEStore();
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
@@ -68,11 +72,17 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="ide-header">
       <div className="header-left">
-        <div className="header-logo">
+        <div className="header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} title="Go to home">
           <span className="logo-brand">YaizY</span>
           <span className="logo-divider">|</span>
           <span className="logo-title">Python Editor</span>
         </div>
+        {project && (
+          <div className="project-name-display">
+            <span className="project-name-label">Project:</span>
+            <span className="project-name-text">{project.name}</span>
+          </div>
+        )}
       </div>
 
       <div className="header-center">
@@ -98,6 +108,17 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="header-right">
+        {/* New Project button - only when authenticated */}
+        {isAuthenticated && (
+          <button
+            className="header-button header-gradient-button"
+            onClick={() => navigate('/projects')}
+            title="Create new project"
+          >
+            + New Project
+          </button>
+        )}
+
         {/* Share button - only show when editing saved project */}
         {projectMeta && isAuthenticated && (
           <ShareButton
