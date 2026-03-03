@@ -1457,24 +1457,6 @@ body {
   background: transparent;
 }
 
-.resize-handle-vertical {
-  width: 4px;
-  cursor: col-resize;
-}
-
-.resize-handle-vertical:hover {
-  background: var(--color-primary);
-}
-
-.resize-handle-horizontal {
-  height: 4px;
-  cursor: row-resize;
-}
-
-.resize-handle-horizontal:hover {
-  background: var(--color-primary);
-}
-
 /* Panel toggles */
 
 .panel-toggle {
