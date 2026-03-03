@@ -6,16 +6,18 @@ import { useIDEStore } from '@/store/ideStore';
 interface ConsoleProps {
   logs: ConsoleLog[];
   onClear: () => void;
+  onRun: () => void;
+  isRunning: boolean;
 }
 
-export const Console: React.FC<ConsoleProps> = ({ logs, onClear }) => {
+export const Console: React.FC<ConsoleProps> = ({ logs, onClear, onRun, isRunning }) => {
   const [showTurtle, setShowTurtle] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [waitingForInput, setWaitingForInput] = useState(false);
   const [currentPrompt, setCurrentPrompt] = useState('');
   const consoleEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { activeFile, isRunning } = useIDEStore();
+  const { activeFile } = useIDEStore();
 
   // Show turtle canvas when code contains "import turtle"
   useEffect(() => {
@@ -139,9 +141,26 @@ export const Console: React.FC<ConsoleProps> = ({ logs, onClear }) => {
     <div className="console">
       <div className="console-header">
         <h3 className="console-title">Console</h3>
-        <button className="console-clear-button" onClick={handleClear} title="Clear console">
-          Clear
-        </button>
+        <div className="console-actions">
+          <button 
+            className="console-run-button" 
+            onClick={onRun}
+            disabled={isRunning}
+            title="Run code (Ctrl+Enter)"
+          >
+            <span className="button-icon">▶</span>
+            <span className="button-text">Run</span>
+          </button>
+          <button 
+            className="console-clear-button" 
+            onClick={handleClear}
+            disabled={isRunning}
+            title="Clear console (Esc)"
+          >
+            <span className="button-icon">🗑️</span>
+            <span className="button-text">Clear</span>
+          </button>
+        </div>
       </div>
 
       <div className="console-body">

@@ -167,7 +167,12 @@ export const Layout: React.FC<LayoutProps> = ({ pyodideStatus }) => {
 
               <div className="console-tab-content">
                 {consoleTab === 'console' && (
-                  <Console logs={consoleLogs} onClear={clearConsole} />
+                  <Console 
+                    logs={consoleLogs} 
+                    onClear={clearConsole}
+                    onRun={runCode}
+                    isRunning={isRunning}
+                  />
                 )}
                 {consoleTab === 'errors' && <ErrorPanel error={currentError} />}
               </div>

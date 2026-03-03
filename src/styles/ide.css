@@ -204,13 +204,12 @@ body {
   justify-content: space-between;
   height: var(--header-height);
   padding: 0 var(--spacing-md);
-  background: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
+  background: white;
+  border-bottom: 2px solid var(--color-primary);
   gap: var(--spacing-md);
 }
 
 .header-left,
-.header-center,
 .header-right {
   display: flex;
   align-items: center;
@@ -234,7 +233,7 @@ body {
 .logo-brand {
   font-size: 20px;
   font-weight: 700;
-  color: #FF6B35;
+  color: var(--color-primary);
   letter-spacing: -0.3px;
 }
 
@@ -244,20 +243,22 @@ body {
 }
 
 .file-menu-button {
-  padding: 8px 16px;
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
+  padding: 10px 18px;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 8px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  color: var(--color-text);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 168, 255, 0.2);
 }
 
 .file-menu-button:hover {
-  background: var(--color-bg-secondary);
-  border-color: #667eea;
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 168, 255, 0.3);
 }
 
 .file-menu-dropdown {
@@ -309,10 +310,10 @@ body {
 }
 
 .project-name-editable {
-  padding: 8px 16px;
-  background: white;
-  border: 2px solid var(--color-border);
-  border-radius: 6px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, rgba(0, 168, 255, 0.1) 0%, rgba(0, 168, 255, 0.05) 100%);
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -321,50 +322,137 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--color-text);
 }
 
 .project-name-editable:hover {
-  border-color: #667eea;
-  background: var(--color-bg-secondary);
+  border-color: var(--color-primary-hover);
+  background: linear-gradient(135deg, rgba(0, 168, 255, 0.15) 0%, rgba(0, 168, 255, 0.08) 100%);
+  transform: translateY(-1px);
 }
 
 .project-name-input {
-  padding: 8px 16px;
-  border: 2px solid #667eea;
-  border-radius: 6px;
+  padding: 10px 18px;
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   min-width: 200px;
   max-width: 300px;
+  color: var(--color-text);
 }
 
 .project-name-input:focus {
   outline: none;
-  border-color: #764ba2;
+  border-color: var(--color-primary-hover);
+  box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.1);
 }
 
 .profile-button-extended {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  gap: 10px;
+  padding: 10px 18px;
+  background: var(--color-secondary);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(255, 102, 0, 0.2);
 }
 
 .profile-button-extended:hover {
+  background: var(--color-secondary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 8px rgba(255, 102, 0, 0.3);
 }
 
 .profile-username {
   font-size: 14px;
+  font-weight: 600;
+}
+
+.run-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.run-control-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+}
+
+.run-control-button .button-icon {
+  font-size: 14px;
+}
+
+.run-control-button .button-text {
+  font-size: 14px;
+}
+
+.run-control-button.run-button {
+  background: var(--color-success);
+}
+
+.run-control-button.run-button:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.run-control-button.clear-button {
+  background: var(--color-error);
+}
+
+.run-control-button.clear-button:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+}
+
+.run-control-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.run-control-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-left: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-bg);
+  border-radius: var(--border-radius-sm);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.terminal-with-controls {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.terminal-with-controls .terminal-container {
+  flex: 1;
+  overflow: hidden;
 }
 
 .logo-divider {

@@ -18,6 +18,47 @@ interface HeaderProps {
   pyodideStatus: PyodideStatus;
 }
 
+interface RunControlsProps {
+  onRun: () => void;
+  onClear: () => void;
+  isRunning: boolean;
+  pyodideStatus: PyodideStatus;
+}
+
+// Separate component for Run/Clear controls to be used above terminal
+export const RunControls: React.FC<RunControlsProps> = ({ onRun, onClear, isRunning, pyodideStatus }) => {
+  return (
+    <div className="run-controls">
+      <button
+        className="run-control-button run-button"
+        onClick={onRun}
+        disabled={isRunning || pyodideStatus !== 'ready'}
+        title="Run code (Ctrl+Enter)"
+      >
+        <span className="button-icon">▶</span>
+        <span className="button-text">Run</span>
+      </button>
+
+      <button
+        className="run-control-button clear-button"
+        onClick={onClear}
+        disabled={isRunning}
+        title="Clear console (Esc)"
+      >
+        <span className="button-icon">🗑️</span>
+        <span className="button-text">Clear</span>
+      </button>
+      
+      {pyodideStatus === 'loading' && (
+        <div className="run-control-status">
+          <span className="status-spinner">⚙</span>
+          <span>Loading...</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const Header: React.FC<HeaderProps> = ({
   onRun,
   onClear,
@@ -191,35 +232,6 @@ export const Header: React.FC<HeaderProps> = ({
         onChange={handleFileChange}
         style={{ display: 'none' }}
       />
-
-      <div className="header-center">
-        <button
-          className="header-button run-button"
-          onClick={onRun}
-          disabled={isRunning || pyodideStatus !== 'ready'}
-          title="Run code (Ctrl+Enter)"
-        >
-          <span className="button-icon">▶</span>
-          <span className="button-text">Run</span>
-        </button>
-
-        <button
-          className="header-button clear-button"
-          onClick={onClear}
-          disabled={isRunning}
-          title="Clear console (Esc)"
-        >
-          <span className="button-icon">🗑️</span>
-          <span className="button-text">Clear</span>
-        </button>
-
-        {pyodideStatus === 'loading' && (
-          <div className="header-status">
-            <span className="status-spinner">⚙</span>
-            <span>Loading...</span>
-          </div>
-        )}
-      </div>
 
       <div className="header-right">
         {/* Auth button */}

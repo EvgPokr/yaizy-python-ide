@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Header } from './Header';
+import { Header, RunControls } from './Header';
 import { FilePanel } from './FilePanel';
 import { Editor } from './Editor';
 import { Terminal, clearTerminal } from '../Terminal/Terminal';
@@ -177,10 +177,18 @@ export const BackendLayout: React.FC = () => {
                 defaultSize={canvasCollapsed ? 95 : 50} 
                 minSize={30}
               >
-                <Terminal
-                  onData={sendInput}
-                  onResize={resize}
-                />
+                <div className="terminal-with-controls">
+                  <RunControls
+                    onRun={handleRun}
+                    onClear={handleClear}
+                    isRunning={isRunning}
+                    pyodideStatus={isConnected ? 'ready' : 'loading'}
+                  />
+                  <Terminal
+                    onData={sendInput}
+                    onResize={resize}
+                  />
+                </div>
               </Panel>
             </PanelGroup>
           </Panel>
