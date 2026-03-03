@@ -476,20 +476,24 @@ body {
   flex-shrink: 0;
 }
 
-.right-panel-container > .canvas-panel {
-  flex-shrink: 0;
-}
-
-.right-panel-container > .terminal-wrapper {
+.right-panel-container > .panels-group {
   flex: 1;
   overflow: hidden;
-  min-height: 200px;
-  margin: 0 8px 8px 8px;
 }
 
-.terminal-wrapper .terminal-container {
-  border-radius: 0 0 8px 8px;
-  overflow: hidden;
+.resize-handle-vertical {
+  height: 2px;
+  background: #333;
+  cursor: row-resize;
+  margin: 0 8px;
+  transition: background 0.2s;
+  position: relative;
+  z-index: 10;
+}
+
+.resize-handle-vertical:hover {
+  background: #00A8FF;
+  height: 3px;
 }
 
 .logo-divider {
