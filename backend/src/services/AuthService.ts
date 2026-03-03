@@ -25,12 +25,17 @@ export class AuthService {
    * Login with username and password
    */
   async login(username: string, password: string): Promise<LoginResult> {
+    console.log('Login attempt for username:', username);
+    
     const user = db.prepare(`
       SELECT id, username, password_hash, email, full_name, role, created_at
       FROM users WHERE username = ?
     `).get(username) as any;
 
+    console.log('User found:', user ? 'yes' : 'no');
+
     if (!user) {
+      console.log('Available users:', db.prepare('SELECT username FROM users').all());
       throw new Error('Invalid username or password');
     }
 
