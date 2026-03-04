@@ -35,6 +35,7 @@
   height: 32px;
   width: auto;
   object-fit: contain;
+  mix-blend-mode: multiply;
 }
 
 .logo-brand {
