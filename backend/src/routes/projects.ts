@@ -79,7 +79,9 @@ router.post('/', authMiddleware, (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Project name is required' });
     }
 
+    console.log(`Creating project "${name}" in folder: ${folderId || 'root'}`);
     const project = projectService.createProject(req.userId!, name, description, isPublic, folderId);
+    console.log(`✅ Project created: ${project.id} in folder: ${project.folder_id || 'root'}`);
     res.status(201).json(project);
   } catch (error: any) {
     console.error('Create project error:', error);

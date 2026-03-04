@@ -161,14 +161,20 @@ export const ProjectsPage: React.FC = () => {
   const handleNewProject = async () => {
     try {
       const projectName = getUniqueUntitledName();
+      console.log(`Creating project "${projectName}" in folder:`, selectedFolder || 'root');
+      
       // Create project in currently selected folder (or root if All Projects selected)
       const newProject = await projectsClient.createProject(projectName, '', false, selectedFolder);
+      console.log('Project created:', newProject);
       
       // Reload data to show the new project in the current view
       await loadData();
+      console.log('Data reloaded after project creation');
       
-      // Then navigate to editor
-      navigate(`/editor/${newProject.id}`);
+      // Navigate to editor after a short delay to ensure UI updates
+      setTimeout(() => {
+        navigate(`/editor/${newProject.id}`);
+      }, 100);
     } catch (err: any) {
       alert(err.message || 'Failed to create project');
     }
@@ -435,42 +441,48 @@ export const ProjectsPage: React.FC = () => {
 
                         {/* Move to folder dialog */}
                         {movingProjectId === project.id && (
-                          <div className="move-dialog" onClick={(e) => e.stopPropagation()}>
-                            <p>Move to folder:</p>
-                            {folders.length === 0 ? (
-                              <p style={{ fontSize: '13px', color: '#666', margin: '8px 0' }}>
-                                No folders yet. Create one first.
-                              </p>
-                            ) : (
-                              folders.map(folder => (
-                                <button
-                                  key={folder.id}
-                                  onClick={() => handleMoveProject(project.id, folder.id)}
-                                  disabled={folder.id === project.folder_id}
-                                >
-                                  📂 {folder.name}
-                                </button>
-                              ))
-                            )}
-                            <button 
-                              onClick={() => {
-                                setMovingProjectId(null);
-                                setIsCreatingFolder(true);
-                              }}
-                              style={{ 
-                                background: '#00A8FF', 
-                                color: 'white',
-                                marginTop: folders.length > 0 ? '8px' : '0',
-                                borderTop: folders.length > 0 ? '1px solid #ddd' : 'none',
-                                paddingTop: folders.length > 0 ? '12px' : '8px'
-                              }}
-                            >
-                              ➕ Add New Folder
-                            </button>
-                            <button onClick={() => setMovingProjectId(null)} className="cancel">
-                              Cancel
-                            </button>
-                          </div>
+                          <>
+                            <div 
+                              className="move-dialog-overlay" 
+                              onClick={() => setMovingProjectId(null)}
+                            />
+                            <div className="move-dialog" onClick={(e) => e.stopPropagation()}>
+                              <p>Move to folder:</p>
+                              {folders.length === 0 ? (
+                                <p style={{ fontSize: '13px', color: '#666', margin: '8px 0' }}>
+                                  No folders yet. Create one first.
+                                </p>
+                              ) : (
+                                folders.map(folder => (
+                                  <button
+                                    key={folder.id}
+                                    onClick={() => handleMoveProject(project.id, folder.id)}
+                                    disabled={folder.id === project.folder_id}
+                                  >
+                                    📂 {folder.name}
+                                  </button>
+                                ))
+                              )}
+                              <button 
+                                onClick={() => {
+                                  setMovingProjectId(null);
+                                  setIsCreatingFolder(true);
+                                }}
+                                style={{ 
+                                  background: '#00A8FF', 
+                                  color: 'white',
+                                  marginTop: folders.length > 0 ? '8px' : '0',
+                                  borderTop: folders.length > 0 ? '1px solid #ddd' : 'none',
+                                  paddingTop: folders.length > 0 ? '12px' : '8px'
+                                }}
+                              >
+                                ➕ Add New Folder
+                              </button>
+                              <button onClick={() => setMovingProjectId(null)} className="cancel">
+                                Cancel
+                              </button>
+                            </div>
+                          </>
                         )}
                       </>
                     )}
