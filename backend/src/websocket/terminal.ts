@@ -336,13 +336,6 @@ export class TerminalWebSocketHandler {
       stream.removeListener('error', onError);
       this.connections.delete(sessionId);
     });
-
-    // Send welcome message
-    const welcomeMessage: WebSocketMessage = {
-      type: 'stdout',
-      data: '\x1b[1;32m✓ Terminal connected\x1b[0m\r\n',
-    };
-    ws.send(JSON.stringify(welcomeMessage));
   }
 
   private handleWebSocketMessage(sessionId: string, message: WebSocketMessage): void {
