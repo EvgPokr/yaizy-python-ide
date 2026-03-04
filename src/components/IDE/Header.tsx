@@ -117,6 +117,31 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  const getUniqueUntitledName = async () => {
+    try {
+      // Get all existing projects
+      const projects = await projectsClient.getProjects();
+      const existingNames = projects.map(p => p.name.toLowerCase());
+      
+      // If no "untitled" exists, return "Untitled"
+      if (!existingNames.includes('untitled')) {
+        return 'Untitled';
+      }
+      
+      // Find the next available number
+      let number = 1;
+      while (existingNames.includes(`untitled-${number}`)) {
+        number++;
+      }
+      
+      return `Untitled-${number}`;
+    } catch (error) {
+      // If error fetching projects, just return "Untitled"
+      console.error('Failed to fetch projects for unique name:', error);
+      return 'Untitled';
+    }
+  };
+
   const handleNewProject = async () => {
     if (!isAuthenticated) {
       // Guest mode: confirm before creating new project
@@ -159,8 +184,9 @@ export const Header: React.FC<HeaderProps> = ({
     }
 
     try {
-      // Authenticated: Create new project with "Untitled" name
-      const newProject = await projectsClient.createProject('Untitled', '', false);
+      // Authenticated: Create new project with unique "Untitled" name
+      const projectName = await getUniqueUntitledName();
+      const newProject = await projectsClient.createProject(projectName, '', false);
       
       // Navigate to the new project's editor
       navigate(`/editor/${newProject.id}`);

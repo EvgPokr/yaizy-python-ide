@@ -139,9 +139,28 @@ export const ProjectsPage: React.FC = () => {
     navigate('/login');
   };
 
+  const getUniqueUntitledName = () => {
+    // Get all existing project names
+    const existingNames = projects.map(p => p.name.toLowerCase());
+    
+    // If no "untitled" exists, return "Untitled"
+    if (!existingNames.includes('untitled')) {
+      return 'Untitled';
+    }
+    
+    // Find the next available number
+    let number = 1;
+    while (existingNames.includes(`untitled-${number}`)) {
+      number++;
+    }
+    
+    return `Untitled-${number}`;
+  };
+
   const handleNewProject = async () => {
     try {
-      const newProject = await projectsClient.createProject('Untitled', '', false);
+      const projectName = getUniqueUntitledName();
+      const newProject = await projectsClient.createProject(projectName, '', false);
       navigate(`/editor/${newProject.id}`);
     } catch (err: any) {
       alert(err.message || 'Failed to create project');
@@ -149,11 +168,17 @@ export const ProjectsPage: React.FC = () => {
   };
 
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString('en-US', {
+    const date = new Date(timestamp);
+    const dateStr = date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
     });
+    const timeStr = date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    return `${dateStr} at ${timeStr}`;
   };
 
   return (

@@ -6,6 +6,30 @@ import { useIDEStore } from './ideStore';
 import { useProjectMetaStore } from './projectMetaStore';
 
 /**
+ * Get unique Untitled name by checking existing projects
+ */
+async function getUniqueUntitledName(): Promise<string> {
+  try {
+    const projects = await projectsClient.getProjects();
+    const existingNames = projects.map(p => p.name.toLowerCase());
+    
+    if (!existingNames.includes('untitled')) {
+      return 'Untitled';
+    }
+    
+    let number = 1;
+    while (existingNames.includes(`untitled-${number}`)) {
+      number++;
+    }
+    
+    return `Untitled-${number}`;
+  } catch (error) {
+    console.error('Failed to fetch projects for unique name:', error);
+    return 'Untitled';
+  }
+}
+
+/**
  * Migrate guest project to server after login/registration
  * Returns the created project with all files if successful
  */
@@ -21,9 +45,12 @@ async function migrateGuestProject() {
 
     console.log('Migrating guest project to server:', guestProject.name);
 
-    // Create project on server with name "Untitled"
+    // Get unique name for the project
+    const projectName = await getUniqueUntitledName();
+
+    // Create project on server with unique name
     const createdProject = await projectsClient.createProject(
-      'Untitled',
+      projectName,
       '', // description
       false // isPublic
     );
