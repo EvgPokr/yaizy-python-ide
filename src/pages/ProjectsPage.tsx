@@ -204,7 +204,7 @@ export const ProjectsPage: React.FC = () => {
       <header className="projects-header">
         <div className="header-left">
           <div className="header-logo">
-            <span className="logo-brand">YaizY</span>
+            <img src="/yaizy-logo-new.png" alt="YaizY" className="logo-image" />
             <span className="logo-divider">|</span>
             <span className="logo-title">Python Editor</span>
           </div>

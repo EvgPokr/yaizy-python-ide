@@ -223,7 +223,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="header-left">
         {/* Logo */}
         <div className="header-logo" onClick={() => navigate('/')} title="Go to home">
-          <span className="logo-brand">YaizY</span>
+          <img src="/yaizy-logo-new.png" alt="YaizY" className="logo-image" />
           <span className="logo-divider">|</span>
           <span className="logo-title">Python Editor</span>
         </div>

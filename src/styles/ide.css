@@ -230,6 +230,12 @@ body {
   opacity: 0.8;
 }
 
+.logo-image {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
 .logo-brand {
   font-size: 20px;
   font-weight: 700;
