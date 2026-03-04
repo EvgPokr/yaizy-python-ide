@@ -41,11 +41,16 @@ class Server {
     // Setup WebSocket servers (two separate ones for terminal and canvas)
     this.terminalWSS = new WebSocketServer({
       noServer: true,
+      clientTracking: true,
     });
     
     this.canvasWSS = new WebSocketServer({
       noServer: true,
+      clientTracking: true,
     });
+
+    // Setup keepalive ping/pong for WebSocket connections
+    this.setupWebSocketKeepalive();
     
     // Setup WebSocket handlers
     this.terminalWSHandler = new TerminalWebSocketHandler(
@@ -194,6 +199,52 @@ class Server {
       console.error('Unhandled rejection at:', promise, 'reason:', reason);
       shutdown('UNHANDLED_REJECTION');
     });
+  }
+
+  /**
+   * Setup keepalive ping/pong for WebSocket connections
+   * Sends ping every 30 seconds to keep connections alive
+   */
+  private setupWebSocketKeepalive(): void {
+    const interval = setInterval(() => {
+      // Ping terminal WebSocket clients
+      this.terminalWSS.clients.forEach((ws: any) => {
+        if (ws.isAlive === false) {
+          return ws.terminate();
+        }
+        ws.isAlive = false;
+        ws.ping();
+      });
+
+      // Ping canvas WebSocket clients
+      this.canvasWSS.clients.forEach((ws: any) => {
+        if (ws.isAlive === false) {
+          return ws.terminate();
+        }
+        ws.isAlive = false;
+        ws.ping();
+      });
+    }, 30000); // 30 seconds
+
+    // Setup pong handler for terminal WebSocket
+    this.terminalWSS.on('connection', (ws: any) => {
+      ws.isAlive = true;
+      ws.on('pong', () => {
+        ws.isAlive = true;
+      });
+    });
+
+    // Setup pong handler for canvas WebSocket
+    this.canvasWSS.on('connection', (ws: any) => {
+      ws.isAlive = true;
+      ws.on('pong', () => {
+        ws.isAlive = true;
+      });
+    });
+
+    // Clear interval on shutdown
+    process.on('SIGTERM', () => clearInterval(interval));
+    process.on('SIGINT', () => clearInterval(interval));
   }
 
   async start(): Promise<void> {
