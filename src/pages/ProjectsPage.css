@@ -653,6 +653,15 @@
 .public-badge {
   margin-left: 8px;
   font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #00A8FF;
+}
+
+.public-badge svg {
+  width: 16px;
+  height: 16px;
 }
 
 .move-dialog-overlay {
