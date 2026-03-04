@@ -36,6 +36,8 @@ export const ProjectsPage: React.FC = () => {
         projectsClient.getProjects(),
         foldersClient.getFolders(),
       ]);
+      console.log('📦 Loaded projects:', projectsData.length, 'projects');
+      console.log('Projects by folder:', projectsData.map(p => ({ name: p.name, folder_id: p.folder_id })));
       setProjects(projectsData);
       setFolders(foldersData);
     } catch (err: any) {
@@ -50,7 +52,8 @@ export const ProjectsPage: React.FC = () => {
     if (!newProjectName.trim()) return;
 
     try {
-      await projectsClient.createProject(newProjectName.trim());
+      console.log(`Creating project via form in folder:`, selectedFolder || 'root');
+      await projectsClient.createProject(newProjectName.trim(), '', false, selectedFolder);
       setNewProjectName('');
       setIsCreating(false);
       await loadData();
@@ -161,21 +164,23 @@ export const ProjectsPage: React.FC = () => {
   const handleNewProject = async () => {
     try {
       const projectName = getUniqueUntitledName();
-      console.log(`Creating project "${projectName}" in folder:`, selectedFolder || 'root');
+      console.log(`🔵 Creating project "${projectName}" in folder:`, selectedFolder || 'root');
       
       // Create project in currently selected folder (or root if All Projects selected)
       const newProject = await projectsClient.createProject(projectName, '', false, selectedFolder);
-      console.log('Project created:', newProject);
+      console.log('🟢 Project created with folder_id:', newProject.folder_id, 'Expected:', selectedFolder);
+      console.log('Full project:', newProject);
       
       // Reload data to show the new project in the current view
       await loadData();
-      console.log('Data reloaded after project creation');
+      console.log('🔄 Data reloaded. Total projects:', projects.length);
       
       // Navigate to editor after a short delay to ensure UI updates
       setTimeout(() => {
         navigate(`/editor/${newProject.id}`);
       }, 100);
     } catch (err: any) {
+      console.error('❌ Failed to create project:', err);
       alert(err.message || 'Failed to create project');
     }
   };
@@ -464,16 +469,10 @@ export const ProjectsPage: React.FC = () => {
                                 ))
                               )}
                               <button 
+                                className="add-folder-inline"
                                 onClick={() => {
                                   setMovingProjectId(null);
                                   setIsCreatingFolder(true);
-                                }}
-                                style={{ 
-                                  background: '#00A8FF', 
-                                  color: 'white',
-                                  marginTop: folders.length > 0 ? '8px' : '0',
-                                  borderTop: folders.length > 0 ? '1px solid #ddd' : 'none',
-                                  paddingTop: folders.length > 0 ? '12px' : '8px'
                                 }}
                               >
                                 ➕ Add New Folder

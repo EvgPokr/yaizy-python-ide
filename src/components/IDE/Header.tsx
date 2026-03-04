@@ -282,7 +282,7 @@ export const Header: React.FC<HeaderProps> = ({
               />
             ) : (
               <div
-                className={`project-name-editable ${project.name === 'Untitled' ? 'untitled' : ''}`}
+                className={`project-name-editable ${project.name.startsWith('Untitled') ? 'untitled' : ''}`}
                 onClick={handleStartEditName}
                 title="Click to rename"
               >

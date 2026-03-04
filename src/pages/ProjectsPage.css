@@ -207,7 +207,7 @@
 }
 
 .folder-form-actions button[type="submit"] {
-  background: #667eea;
+  background: #00A8FF;
   color: white;
 }
 
@@ -333,7 +333,7 @@
 .folder-edit-input {
   width: 100%;
   padding: 6px;
-  border: 2px solid #667eea;
+  border: 2px solid #00A8FF;
   border-radius: 4px;
   font-size: 13px;
 }
@@ -349,7 +349,7 @@
 }
 
 .breadcrumb-link {
-  color: #667eea;
+  color: #00A8FF;
   cursor: pointer;
   text-decoration: underline;
 }
@@ -500,6 +500,12 @@
   transition: all 0.2s;
   display: flex;
   flex-direction: column;
+  overflow: visible;
+  z-index: 1;
+}
+
+.project-card:has(.move-dialog) {
+  z-index: 1001;
 }
 
 .project-card:hover {
@@ -525,7 +531,7 @@
 }
 
 .project-header h3:hover {
-  color: #667eea;
+  color: #00A8FF;
 }
 
 .project-actions {
@@ -604,6 +610,8 @@
   right: 0;
   bottom: 0;
   z-index: 999;
+  background: transparent;
+  cursor: default;
 }
 
 .move-dialog {
@@ -612,49 +620,79 @@
   right: 0;
   margin-top: 8px;
   background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid #00A8FF;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 8px 24px rgba(0, 168, 255, 0.25);
   z-index: 1000;
-  min-width: 200px;
+  min-width: 220px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .move-dialog p {
-  margin: 0 0 8px 0;
-  font-size: 13px;
+  margin: 0;
+  padding: 16px;
+  font-size: 14px;
   font-weight: 600;
-  color: #666;
+  color: white;
+  background: linear-gradient(135deg, #FF6B35, #00A8FF);
+  border-bottom: 2px solid #00A8FF;
 }
 
 .move-dialog button {
-  padding: 8px 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
   background: white;
   cursor: pointer;
   font-size: 13px;
   text-align: left;
   transition: all 0.2s;
+  color: #333;
+}
+
+.move-dialog button:last-of-type {
+  border-bottom: none;
 }
 
 .move-dialog button:hover:not(:disabled) {
-  background: #f5f5f5;
-  border-color: #667eea;
+  background: rgba(0, 168, 255, 0.1);
+  color: #00A8FF;
+  font-weight: 600;
 }
 
 .move-dialog button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background: #f9f9f9;
+}
+
+.move-dialog button.add-folder-inline {
+  background: linear-gradient(135deg, #FF6B35, #00A8FF);
+  color: white;
+  font-weight: 600;
+  margin-top: 8px;
+  border: none;
+}
+
+.move-dialog button.add-folder-inline:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 168, 255, 0.3);
 }
 
 .move-dialog button.cancel {
-  background: #f0f0f0;
-  color: #666;
+  background: #9ca3af;
+  color: white;
   font-weight: 600;
-  margin-top: 6px;
+  margin-top: 4px;
+  border: none;
+}
+
+.move-dialog button.cancel:hover {
+  background: #6b7280;
 }
