@@ -496,6 +496,7 @@
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 2px solid transparent;
+  position: relative;
   transition: all 0.2s;
   display: flex;
   flex-direction: column;
@@ -530,6 +531,7 @@
 .project-actions {
   display: flex;
   gap: 8px;
+  position: relative;
 }
 
 .project-actions button {
@@ -610,6 +612,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .move-dialog p {
