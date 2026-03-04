@@ -231,6 +231,16 @@ export const ProjectsPage: React.FC = () => {
       </header>
 
       <div className="projects-container">
+        {/* Global overlay for closing dialogs */}
+        {movingProjectId !== null && (
+          <div 
+            className="move-dialog-overlay" 
+            onClick={() => setMovingProjectId(null)}
+          />
+        )}
+        
+        <h1 className="page-title">My Projects</h1>
+        
         {error && (
           <div className="error-message">
             {error}
@@ -446,13 +456,8 @@ export const ProjectsPage: React.FC = () => {
 
                         {/* Move to folder dialog */}
                         {movingProjectId === project.id && (
-                          <>
-                            <div 
-                              className="move-dialog-overlay" 
-                              onClick={() => setMovingProjectId(null)}
-                            />
                             <div className="move-dialog" onClick={(e) => e.stopPropagation()}>
-                              <p>Move to folder:</p>
+                              <p>Add to folder:</p>
                               {folders.length === 0 ? (
                                 <p style={{ fontSize: '13px', color: '#666', margin: '8px 0' }}>
                                   No folders yet. Create one first.
@@ -481,7 +486,6 @@ export const ProjectsPage: React.FC = () => {
                                 Cancel
                               </button>
                             </div>
-                          </>
                         )}
                       </>
                     )}

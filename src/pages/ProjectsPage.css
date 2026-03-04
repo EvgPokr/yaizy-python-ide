@@ -126,6 +126,15 @@
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  position: relative;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 32px 0;
+  text-align: left;
 }
 
 .projects-layout {
@@ -190,6 +199,13 @@
   border-radius: 4px;
   font-size: 13px;
   margin-bottom: 6px;
+  transition: all 0.2s;
+}
+
+.folder-form input:focus {
+  outline: none;
+  border-color: #00A8FF;
+  box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.1);
 }
 
 .folder-form-actions {
@@ -336,6 +352,12 @@
   border: 2px solid #00A8FF;
   border-radius: 4px;
   font-size: 13px;
+  transition: all 0.2s;
+}
+
+.folder-edit-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.1);
 }
 
 .projects-main {
@@ -568,6 +590,12 @@
   border-radius: 6px;
   font-size: 16px;
   font-weight: 600;
+  transition: all 0.2s;
+}
+
+.project-edit input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.1);
 }
 
 .project-meta {
@@ -635,12 +663,12 @@
 
 .move-dialog p {
   margin: 0;
-  padding: 16px;
+  padding: 14px 16px;
   font-size: 14px;
   font-weight: 600;
   color: white;
-  background: linear-gradient(135deg, #FF6B35, #00A8FF);
-  border-bottom: 2px solid #00A8FF;
+  background: #00A8FF;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .move-dialog button {
@@ -672,17 +700,18 @@
 }
 
 .move-dialog button.add-folder-inline {
-  background: linear-gradient(135deg, #FF6B35, #00A8FF);
-  color: white;
+  background: rgba(0, 168, 255, 0.1);
+  color: #00A8FF;
   font-weight: 600;
   margin-top: 8px;
-  border: none;
+  border: 1px solid #00A8FF;
+  border-radius: 6px;
 }
 
 .move-dialog button.add-folder-inline:hover {
-  opacity: 0.9;
+  background: #00A8FF;
+  color: white;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 168, 255, 0.3);
 }
 
 .move-dialog button.cancel {
