@@ -2,12 +2,14 @@ import { create } from 'zustand';
 import { authClient, User } from '@/lib/api/authClient';
 import { projectStorage } from '@/lib/storage/projectStorage';
 import { projectsClient } from '@/lib/api/projectsClient';
+import { useIDEStore } from './ideStore';
+import { useProjectMetaStore } from './projectMetaStore';
 
 /**
  * Migrate guest project to server after login/registration
- * Returns the created project ID if successful
+ * Returns the created project with all files if successful
  */
-async function migrateGuestProject(): Promise<string | null> {
+async function migrateGuestProject() {
   try {
     // Load current guest project from localStorage
     const guestProject = await projectStorage.load();
@@ -19,9 +21,9 @@ async function migrateGuestProject(): Promise<string | null> {
 
     console.log('Migrating guest project to server:', guestProject.name);
 
-    // Create project on server
+    // Create project on server with name "Untitled"
     const createdProject = await projectsClient.createProject(
-      guestProject.name,
+      'Untitled',
       '', // description
       false // isPublic
     );
@@ -35,11 +37,14 @@ async function migrateGuestProject(): Promise<string | null> {
       );
     }
 
+    // Fetch the complete project with all files
+    const completeProject = await projectsClient.getProject(createdProject.id);
+
     // Clear guest project from localStorage
     await projectStorage.clear();
 
     console.log('Guest project migrated successfully:', createdProject.id);
-    return createdProject.id;
+    return completeProject;
   } catch (error) {
     console.error('Failed to migrate guest project:', error);
     // Don't throw - migration failure shouldn't break login
@@ -85,7 +90,35 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       // Migrate guest project to server after successful login
-      await migrateGuestProject();
+      const migratedProject = await migrateGuestProject();
+      
+      // Load migrated project into IDE
+      if (migratedProject) {
+        const { setProject } = useIDEStore.getState();
+        const { setProjectMeta } = useProjectMetaStore.getState();
+        
+        // Convert server project to local project format
+        const localProject = {
+          id: migratedProject.id,
+          name: migratedProject.name,
+          files: migratedProject.files.map(f => ({
+            id: f.id,
+            name: f.name,
+            content: f.content,
+            language: 'python' as const,
+            createdAt: new Date(f.created_at),
+            updatedAt: new Date(f.updated_at),
+          })),
+          activeFileId: migratedProject.files[0]?.id || '',
+          createdAt: new Date(migratedProject.created_at),
+          updatedAt: new Date(migratedProject.updated_at),
+        };
+        
+        setProject(localProject);
+        setProjectMeta(migratedProject);
+        
+        console.log('Migrated project loaded into IDE:', migratedProject.name);
+      }
     } catch (error: any) {
       set({
         error: error.message || 'Login failed',
@@ -123,7 +156,35 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       // Migrate guest project to server after successful registration
-      await migrateGuestProject();
+      const migratedProject = await migrateGuestProject();
+      
+      // Load migrated project into IDE
+      if (migratedProject) {
+        const { setProject } = useIDEStore.getState();
+        const { setProjectMeta } = useProjectMetaStore.getState();
+        
+        // Convert server project to local project format
+        const localProject = {
+          id: migratedProject.id,
+          name: migratedProject.name,
+          files: migratedProject.files.map(f => ({
+            id: f.id,
+            name: f.name,
+            content: f.content,
+            language: 'python' as const,
+            createdAt: new Date(f.created_at),
+            updatedAt: new Date(f.updated_at),
+          })),
+          activeFileId: migratedProject.files[0]?.id || '',
+          createdAt: new Date(migratedProject.created_at),
+          updatedAt: new Date(migratedProject.updated_at),
+        };
+        
+        setProject(localProject);
+        setProjectMeta(migratedProject);
+        
+        console.log('Migrated project loaded into IDE:', migratedProject.name);
+      }
     } catch (error: any) {
       set({
         error: error.message || 'Registration failed',
