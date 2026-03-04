@@ -97,8 +97,8 @@ export class TerminalWebSocketHandler {
         /^echo\s+"__RUN_START__"/,             // echo command
         /^__RUN_START__\s*$/,                  // __RUN_START__ marker
         /^stty\s+/,                            // stty commands
-        /^student@[a-f0-9]+:\/workspace\$/,   // Bash prompt at start of line
-        /student@[a-f0-9]+:\/workspace\$\s*$/, // Bash prompt at end
+        /student@[a-f0-9]+:\/workspace\$/,     // Bash prompt (anywhere in line)
+        /^✓\s*Terminal\s+connected/i,          // Terminal connected message
       ];
       
       const lines = dataBuffer.split('\n');
