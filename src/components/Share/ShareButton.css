@@ -9,6 +9,14 @@
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 0 2px 4px rgba(0, 168, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.share-button svg {
+  width: 16px;
+  height: 16px;
 }
 
 .share-button:hover {

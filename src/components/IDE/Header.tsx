@@ -234,7 +234,12 @@ export const Header: React.FC<HeaderProps> = ({
             className="file-menu-button"
             onClick={() => setShowFileMenu(!showFileMenu)}
           >
-            <span className="file-menu-icon">📄</span>
+            <span className="file-menu-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/>
+                <path d="M14 2v5a1 1 0 0 0 1 1h5"/>
+              </svg>
+            </span>
             File ▾
           </button>
           {showFileMenu && (
@@ -243,21 +248,40 @@ export const Header: React.FC<HeaderProps> = ({
                 handleNewProject();
                 setShowFileMenu(false);
               }}>
-                <span className="menu-icon">📄</span>
+                <span className="menu-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/>
+                    <path d="M14 2v5a1 1 0 0 0 1 1h5"/>
+                  </svg>
+                </span>
                 New
               </button>
               <button onClick={() => {
                 handleImportClick();
                 setShowFileMenu(false);
               }}>
-                <span className="menu-icon">📥</span>
+                <span className="menu-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/>
+                    <path d="M14 2v5a1 1 0 0 0 1 1h5"/>
+                    <path d="M12 12v6"/>
+                    <path d="m15 15-3-3-3 3"/>
+                  </svg>
+                </span>
                 Load from your computer
               </button>
               <button onClick={() => {
                 onExport();
                 setShowFileMenu(false);
               }}>
-                <span className="menu-icon">📤</span>
+                <span className="menu-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/>
+                    <path d="M14 2v5a1 1 0 0 0 1 1h5"/>
+                    <path d="M12 18v-6"/>
+                    <path d="m9 15 3 3 3-3"/>
+                  </svg>
+                </span>
                 Save to your computer
               </button>
             </div>
@@ -335,7 +359,12 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                 title={user?.username || 'Profile'}
               >
-                <span className="profile-icon">👤</span>
+                <span className="profile-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="8" r="5"/>
+                    <path d="M20 21a8 8 0 0 0-16 0"/>
+                  </svg>
+                </span>
                 <span className="profile-username">{user?.username} ▾</span>
               </button>
               {showProfileDropdown && (

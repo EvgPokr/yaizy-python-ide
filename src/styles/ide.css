@@ -266,6 +266,14 @@ body {
 
 .file-menu-icon {
   font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-menu-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 .file-menu-dropdown {
@@ -311,6 +319,14 @@ body {
 
 .menu-icon {
   font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 .project-name-container {
@@ -656,10 +672,26 @@ body {
 
 .profile-icon {
   font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 .button-icon {
   font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 .header-status {

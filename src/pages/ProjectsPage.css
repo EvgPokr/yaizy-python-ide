@@ -113,6 +113,14 @@
 
 .profile-icon {
   font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 .projects-container {
@@ -296,6 +304,14 @@
 
 .folder-icon {
   font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 .folder-name {
@@ -335,6 +351,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.folder-actions button svg {
+  width: 14px;
+  height: 14px;
 }
 
 .folder-actions button:hover {
@@ -567,6 +588,14 @@
   font-size: 14px;
   color: #666;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-actions button svg {
+  width: 14px;
+  height: 14px;
 }
 
 .project-actions button:hover {
@@ -676,6 +705,15 @@
   text-align: left;
   transition: all 0.2s;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.move-dialog button svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .move-dialog button:last-of-type {

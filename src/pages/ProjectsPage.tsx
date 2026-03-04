@@ -220,7 +220,12 @@ export const ProjectsPage: React.FC = () => {
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
               title={user?.username || 'Profile'}
             >
-              <span className="profile-icon">👤</span>
+              <span className="profile-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="8" r="5"/>
+                  <path d="M20 21a8 8 0 0 0-16 0"/>
+                </svg>
+              </span>
               <span className="profile-username">{user?.username} ▾</span>
             </button>
             {showProfileDropdown && (
@@ -284,7 +289,11 @@ export const ProjectsPage: React.FC = () => {
                 className={`folder-item folder-item-root ${selectedFolder === null ? 'active' : ''}`}
                 onClick={() => setSelectedFolder(null)}
               >
-                <span className="folder-icon">📁</span>
+                <span className="folder-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/>
+                  </svg>
+                </span>
                 <span className="folder-name">All Projects</span>
                 <span className="folder-count">({projects.length})</span>
               </div>
@@ -310,7 +319,11 @@ export const ProjectsPage: React.FC = () => {
                   ) : (
                     <>
                       <div className="folder-main" onClick={() => setSelectedFolder(folder.id)}>
-                        <span className="folder-icon">📂</span>
+                        <span className="folder-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/>
+                          </svg>
+                        </span>
                         <span className="folder-name">{folder.name}</span>
                         <span className="folder-count">({projects.filter(p => p.folder_id === folder.id).length})</span>
                       </div>
@@ -324,7 +337,10 @@ export const ProjectsPage: React.FC = () => {
                           }}
                           title="Rename"
                         >
-                          ✎
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>
+                            <path d="m15 5 4 4"/>
+                          </svg>
                         </button>
                         <button
                           onClick={(e) => {
@@ -333,7 +349,10 @@ export const ProjectsPage: React.FC = () => {
                           }}
                           title="Delete"
                         >
-                          ✕
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 6 6 18"/>
+                            <path d="m6 6 12 12"/>
+                          </svg>
                         </button>
                       </div>
                     </>
@@ -422,7 +441,9 @@ export const ProjectsPage: React.FC = () => {
                               onClick={() => setMovingProjectId(project.id)}
                               title="Move to folder"
                             >
-                              📁
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/>
+                              </svg>
                             </button>
                             <button
                               onClick={() => {
@@ -432,14 +453,20 @@ export const ProjectsPage: React.FC = () => {
                               }}
                               title="Rename"
                             >
-                              ✎
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>
+                                <path d="m15 5 4 4"/>
+                              </svg>
                             </button>
                             <button
                               onClick={() => handleDeleteProject(project.id, project.name)}
                               className="delete-button"
                               title="Delete"
                             >
-                              ✕
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 6 6 18"/>
+                                <path d="m6 6 12 12"/>
+                              </svg>
                             </button>
                           </div>
                         </div>
@@ -469,7 +496,10 @@ export const ProjectsPage: React.FC = () => {
                                     onClick={() => handleMoveProject(project.id, folder.id)}
                                     disabled={folder.id === project.folder_id}
                                   >
-                                    📂 {folder.name}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/>
+                                    </svg>
+                                    {folder.name}
                                   </button>
                                 ))
                               )}
