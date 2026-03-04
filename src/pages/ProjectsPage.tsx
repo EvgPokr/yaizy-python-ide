@@ -203,7 +203,7 @@ export const ProjectsPage: React.FC = () => {
     <div className="projects-page">
       <header className="projects-header">
         <div className="header-left">
-          <div className="header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} title="Go to home">
+          <div className="header-logo">
             <span className="logo-brand">YaizY</span>
             <span className="logo-divider">|</span>
             <span className="logo-title">Python Editor</span>

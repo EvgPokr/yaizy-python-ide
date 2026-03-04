@@ -29,11 +29,6 @@
   font-size: 18px;
   font-weight: 700;
   height: 40px;
-  transition: opacity 0.2s;
-}
-
-.header-logo:hover {
-  opacity: 0.8;
 }
 
 .logo-brand {
