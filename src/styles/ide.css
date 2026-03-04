@@ -218,7 +218,7 @@ body {
 
 .header-logo {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--spacing-sm);
   font-size: 18px;
   font-weight: 700;
@@ -236,7 +236,7 @@ body {
 }
 
 .logo-image {
-  height: 44px;
+  height: 40px;
   width: auto;
   object-fit: contain;
 }

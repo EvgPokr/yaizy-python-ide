@@ -24,7 +24,7 @@
 
 .header-logo {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--spacing-sm);
   font-size: 18px;
   font-weight: 700;
@@ -32,7 +32,7 @@
 }
 
 .logo-image {
-  height: 44px;
+  height: 40px;
   width: auto;
   object-fit: contain;
 }
@@ -45,8 +45,9 @@
 }
 
 .logo-divider {
-  color: #ccc;
+  color: #d1d5db;
   font-weight: 300;
+  font-size: 20px;
 }
 
 .logo-title {
