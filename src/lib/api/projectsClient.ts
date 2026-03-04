@@ -118,11 +118,11 @@ class ProjectsClient {
   /**
    * Create project
    */
-  async createProject(name: string, description?: string, isPublic: boolean = false): Promise<Project> {
+  async createProject(name: string, description?: string, isPublic: boolean = false, folderId?: string | null): Promise<Project> {
     const response = await fetch(`${this.baseUrl}/api/projects`, {
       method: 'POST',
       headers: this.getAuthHeader(),
-      body: JSON.stringify({ name, description, isPublic }),
+      body: JSON.stringify({ name, description, isPublic, folderId }),
     });
 
     if (!response.ok) {

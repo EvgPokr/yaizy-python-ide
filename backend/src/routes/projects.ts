@@ -73,13 +73,13 @@ router.post('/fork/:id', authMiddleware, (req: AuthRequest, res: Response) => {
  */
 router.post('/', authMiddleware, (req: AuthRequest, res: Response) => {
   try {
-    const { name, description, isPublic } = req.body;
+    const { name, description, isPublic, folderId } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Project name is required' });
     }
 
-    const project = projectService.createProject(req.userId!, name, description, isPublic);
+    const project = projectService.createProject(req.userId!, name, description, isPublic, folderId);
     res.status(201).json(project);
   } catch (error: any) {
     console.error('Create project error:', error);

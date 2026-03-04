@@ -98,14 +98,14 @@ export class ProjectService {
   /**
    * Create new project
    */
-  createProject(userId: string, name: string, description?: string, isPublic: boolean = false): Project {
+  createProject(userId: string, name: string, description?: string, isPublic: boolean = false, folderId?: string | null): Project {
     const projectId = uuidv4();
     const now = Date.now();
 
     db.prepare(`
-      INSERT INTO projects (id, user_id, name, description, is_public, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(projectId, userId, name, description || null, isPublic ? 1 : 0, now, now);
+      INSERT INTO projects (id, user_id, name, description, is_public, folder_id, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(projectId, userId, name, description || null, isPublic ? 1 : 0, folderId || null, now, now);
 
     // Create default main.py file
     const fileId = uuidv4();

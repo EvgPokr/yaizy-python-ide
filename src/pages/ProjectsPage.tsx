@@ -161,7 +161,8 @@ export const ProjectsPage: React.FC = () => {
   const handleNewProject = async () => {
     try {
       const projectName = getUniqueUntitledName();
-      const newProject = await projectsClient.createProject(projectName, '', false);
+      // Create project in currently selected folder (or root if All Projects selected)
+      const newProject = await projectsClient.createProject(projectName, '', false, selectedFolder);
       navigate(`/editor/${newProject.id}`);
     } catch (err: any) {
       alert(err.message || 'Failed to create project');
