@@ -28,16 +28,20 @@ async function migrateGuestProject() {
       false // isPublic
     );
 
-    // Update all files from guest project
-    for (const file of guestProject.files) {
+    // Update the default main.py file with content from guest project
+    // The server creates a project with one file (main.py), we update its content
+    if (createdProject.files.length > 0 && guestProject.files.length > 0) {
+      const serverFileId = createdProject.files[0].id;
+      const guestFileContent = guestProject.files[0].content;
+      
       await projectsClient.updateFile(
         createdProject.id,
-        file.id,
-        file.content
+        serverFileId, // Use server's file ID, not guest's
+        guestFileContent
       );
     }
 
-    // Fetch the complete project with all files
+    // Fetch the complete updated project
     const completeProject = await projectsClient.getProject(createdProject.id);
 
     // Clear guest project from localStorage
