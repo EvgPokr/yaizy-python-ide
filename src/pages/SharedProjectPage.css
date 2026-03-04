@@ -54,6 +54,16 @@
   margin: 0 auto;
 }
 
+.banner-content span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.banner-content span svg {
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
 .fork-banner-button {
   padding: 10px 20px;
   background: white;
@@ -65,6 +75,15 @@
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fork-banner-button svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .fork-banner-button:hover {
