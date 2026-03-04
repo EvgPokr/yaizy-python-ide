@@ -6,7 +6,7 @@
 }
 
 .projects-header {
-  background: #f9fafb;
+  background: white;
   border-bottom: 1px solid #e5e7eb;
   padding: 0 var(--spacing-lg);
   height: 60px;
@@ -24,7 +24,7 @@
 
 .header-logo {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--spacing-sm);
   font-size: 18px;
   font-weight: 700;
@@ -32,7 +32,7 @@
 }
 
 .logo-image {
-  height: 32px;
+  height: 44px;
   width: auto;
   object-fit: contain;
 }
@@ -51,7 +51,9 @@
 
 .logo-title {
   color: #333;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.3px;
 }
 
 .new-project-button {

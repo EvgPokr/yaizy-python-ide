@@ -204,7 +204,7 @@ body {
   justify-content: space-between;
   height: var(--header-height);
   padding: 0 var(--spacing-md);
-  background: #f9fafb;
+  background: white;
   border-bottom: 1px solid #e5e7eb;
   gap: var(--spacing-md);
 }
@@ -218,12 +218,17 @@ body {
 
 .header-logo {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--spacing-sm);
   font-size: 18px;
   font-weight: 700;
   height: 40px;
   transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.header-logo:hover {
+  opacity: 0.8;
 }
 
 .header-logo:hover {
@@ -231,7 +236,7 @@ body {
 }
 
 .logo-image {
-  height: 32px;
+  height: 44px;
   width: auto;
   object-fit: contain;
 }
