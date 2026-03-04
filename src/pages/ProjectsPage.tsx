@@ -130,9 +130,10 @@ export const ProjectsPage: React.FC = () => {
   };
 
   // Get projects in selected folder
+  // "All Projects" shows ALL projects, other folders show only their projects
   const visibleProjects = selectedFolder
     ? projects.filter(p => p.folder_id === selectedFolder)
-    : projects.filter(p => !p.folder_id);
+    : projects; // Show all projects when no folder selected
 
   const handleLogout = () => {
     logout();
@@ -253,18 +254,18 @@ export const ProjectsPage: React.FC = () => {
 
             <div className="folders-list">
               <div
-                className={`folder-item ${selectedFolder === null ? 'active' : ''}`}
+                className={`folder-item folder-item-root ${selectedFolder === null ? 'active' : ''}`}
                 onClick={() => setSelectedFolder(null)}
               >
                 <span className="folder-icon">📁</span>
                 <span className="folder-name">All Projects</span>
-                <span className="folder-count">({projects.filter(p => !p.folder_id).length})</span>
+                <span className="folder-count">({projects.length})</span>
               </div>
 
               {folders.map(folder => (
                 <div
                   key={folder.id}
-                  className={`folder-item ${selectedFolder === folder.id ? 'active' : ''}`}
+                  className={`folder-item folder-item-sub ${selectedFolder === folder.id ? 'active' : ''}`}
                 >
                   {editingId === folder.id && editingType === 'folder' ? (
                     <input
@@ -429,19 +430,37 @@ export const ProjectsPage: React.FC = () => {
                         {/* Move to folder dialog */}
                         {movingProjectId === project.id && (
                           <div className="move-dialog" onClick={(e) => e.stopPropagation()}>
-                            <p>Move to:</p>
-                            <button onClick={() => handleMoveProject(project.id, null)}>
-                              📁 Root (No folder)
+                            <p>Move to folder:</p>
+                            {folders.length === 0 ? (
+                              <p style={{ fontSize: '13px', color: '#666', margin: '8px 0' }}>
+                                No folders yet. Create one first.
+                              </p>
+                            ) : (
+                              folders.map(folder => (
+                                <button
+                                  key={folder.id}
+                                  onClick={() => handleMoveProject(project.id, folder.id)}
+                                  disabled={folder.id === project.folder_id}
+                                >
+                                  📂 {folder.name}
+                                </button>
+                              ))
+                            )}
+                            <button 
+                              onClick={() => {
+                                setMovingProjectId(null);
+                                setIsCreatingFolder(true);
+                              }}
+                              style={{ 
+                                background: '#00A8FF', 
+                                color: 'white',
+                                marginTop: folders.length > 0 ? '8px' : '0',
+                                borderTop: folders.length > 0 ? '1px solid #ddd' : 'none',
+                                paddingTop: folders.length > 0 ? '12px' : '8px'
+                              }}
+                            >
+                              ➕ Add New Folder
                             </button>
-                            {folders.map(folder => (
-                              <button
-                                key={folder.id}
-                                onClick={() => handleMoveProject(project.id, folder.id)}
-                                disabled={folder.id === project.folder_id}
-                              >
-                                📂 {folder.name}
-                              </button>
-                            ))}
                             <button onClick={() => setMovingProjectId(null)} className="cancel">
                               Cancel
                             </button>
