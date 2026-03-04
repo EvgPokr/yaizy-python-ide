@@ -65,4 +65,12 @@
 
 .item-icon {
   font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-icon svg {
+  width: 16px;
+  height: 16px;
 }
