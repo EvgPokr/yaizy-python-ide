@@ -208,10 +208,6 @@ export const ProjectsPage: React.FC = () => {
             <span className="logo-divider">|</span>
             <span className="logo-title">Python Editor</span>
           </div>
-          <button className="new-project-button" onClick={handleNewProject}>
-            <span className="button-icon">+</span>
-            <span className="button-text">New Project</span>
-          </button>
         </div>
         <div className="header-right">
           <div style={{ position: 'relative' }}>
@@ -244,7 +240,13 @@ export const ProjectsPage: React.FC = () => {
           />
         )}
         
-        <h1 className="page-title">My Projects</h1>
+        <div className="page-header">
+          <h1 className="page-title">My Projects</h1>
+          <button className="new-project-button" onClick={handleNewProject}>
+            <span className="button-icon">+</span>
+            <span className="button-text">New Project</span>
+          </button>
+        </div>
         
         {error && (
           <div className="error-message">

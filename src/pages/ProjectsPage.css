@@ -142,11 +142,18 @@
   position: relative;
 }
 
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
 .page-title {
   font-size: 32px;
   font-weight: 700;
   color: #333;
-  margin: 0 0 32px 0;
+  margin: 0;
   text-align: left;
 }
 
@@ -429,7 +436,7 @@
 }
 
 .projects-actions {
-  margin-bottom: 30px;
+  margin-bottom: 0;
 }
 
 .create-project-button {
