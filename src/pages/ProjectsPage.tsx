@@ -208,6 +208,10 @@ export const ProjectsPage: React.FC = () => {
             <span className="logo-divider">|</span>
             <span className="logo-title">Python Editor</span>
           </div>
+          <button className="new-project-button" onClick={handleNewProject}>
+            <span className="button-icon">+</span>
+            <span className="button-text">New Project</span>
+          </button>
         </div>
         <div className="header-right">
           <div style={{ position: 'relative' }}>
@@ -366,43 +370,15 @@ export const ProjectsPage: React.FC = () => {
 
           {/* Main content area */}
           <div className="projects-main">
-            <div className="projects-actions">
-              <div className="breadcrumb">
-                {selectedFolder ? (
-                  <>
-                    <span onClick={() => setSelectedFolder(null)} className="breadcrumb-link">All Projects</span>
-                    <span className="breadcrumb-separator">/</span>
-                    <span>{folders.find(f => f.id === selectedFolder)?.name}</span>
-                  </>
-                ) : (
-                  <span>All Projects</span>
-                )}
-              </div>
-
-              {!isCreating ? (
-                <button 
-                  onClick={() => setIsCreating(true)} 
-                  className="create-project-button"
-                >
-                  + New Project
-                </button>
+            <div className="breadcrumb">
+              {selectedFolder ? (
+                <>
+                  <span onClick={() => setSelectedFolder(null)} className="breadcrumb-link">All Projects</span>
+                  <span className="breadcrumb-separator">/</span>
+                  <span>{folders.find(f => f.id === selectedFolder)?.name}</span>
+                </>
               ) : (
-                <form onSubmit={handleCreateProject} className="create-project-form">
-                  <input
-                    type="text"
-                    value={newProjectName}
-                    onChange={(e) => setNewProjectName(e.target.value)}
-                    placeholder="Enter project name..."
-                    autoFocus
-                  />
-                  <button type="submit">Create</button>
-                  <button type="button" onClick={() => {
-                    setIsCreating(false);
-                    setNewProjectName('');
-                  }}>
-                    Cancel
-                  </button>
-                </form>
+                <span>All Projects</span>
               )}
             </div>
 

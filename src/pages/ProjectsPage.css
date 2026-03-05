@@ -135,7 +135,7 @@
 
 .projects-container {
   flex: 1;
-  padding: 40px;
+  padding: 24px 40px;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
@@ -146,7 +146,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .page-title {
@@ -400,7 +400,7 @@
 .breadcrumb {
   font-size: 14px;
   color: #666;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 
 .breadcrumb-link {
@@ -543,6 +543,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
+  margin-top: 0;
 }
 
 .project-card {
