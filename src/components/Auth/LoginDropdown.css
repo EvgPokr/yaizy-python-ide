@@ -51,6 +51,10 @@
   border: 1px solid #fcc;
 }
 
+.form-field {
+  position: relative;
+}
+
 .form-field input {
   width: 100%;
   padding: 10px 12px;
@@ -64,6 +68,41 @@
 .form-field input:focus {
   outline: none;
   border-color: #00A8FF;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 45px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  transition: color 0.2s;
+  border-radius: 4px;
+}
+
+.password-toggle:hover {
+  color: #00A8FF;
+  background: rgba(0, 168, 255, 0.05);
+}
+
+.password-toggle svg {
+  width: 20px;
+  height: 20px;
 }
 
 .dropdown-submit {
