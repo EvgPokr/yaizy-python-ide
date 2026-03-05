@@ -91,3 +91,25 @@
   cursor: not-allowed;
 }
 
+.forgot-password-link {
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.forgot-password-link button {
+  background: none;
+  border: none;
+  color: #00A8FF;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.forgot-password-link button:hover {
+  color: #0090DD;
+}
+

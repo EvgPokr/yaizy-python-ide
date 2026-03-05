@@ -119,6 +119,19 @@ export function initDatabase() {
     )
   `);
 
+  // Password reset tokens table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      token TEXT UNIQUE NOT NULL,
+      expires_at INTEGER NOT NULL,
+      used INTEGER DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+
   // Create default demo account if not exists
   const defaultUser = db.prepare('SELECT id FROM users WHERE username = ?').get('demo');
   if (!defaultUser) {

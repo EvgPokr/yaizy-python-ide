@@ -14,6 +14,7 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
   const [email, setEmail] = useState('');
   const [grade, setGrade] = useState('');
   const [age, setAge] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { login, register, isLoading, error, clearError } = useAuthStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -35,16 +36,20 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
+    setShowForgotPassword(false);
 
     try {
       if (mode === 'login') {
         await login(username, password);
+        onClose();
       } else {
         await register(username, password, fullName, email, grade, age);
+        onClose();
       }
-      onClose();
     } catch (err) {
-      // Error is already set in store
+      if (mode === 'login') {
+        setShowForgotPassword(true);
+      }
     }
   };
 
@@ -136,6 +141,22 @@ export const LoginDropdown: React.FC<LoginDropdownProps> = ({ onClose }) => {
               ? 'Login'
               : 'Register'}
         </button>
+
+        {mode === 'login' && showForgotPassword && (
+          <div className="forgot-password-link">
+            <button 
+              type="button"
+              onClick={() => {
+                onClose();
+                // Will open forgot password dialog
+                const event = new CustomEvent('openForgotPassword');
+                window.dispatchEvent(event);
+              }}
+            >
+              Forgot password?
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );

@@ -165,6 +165,92 @@ export class AuthService {
       created_at: now,
     };
   }
+
+  /**
+   * Create password reset token
+   */
+  async createPasswordResetToken(email: string): Promise<string> {
+    const user = db.prepare(`
+      SELECT id FROM users WHERE email = ?
+    `).get(email) as any;
+
+    if (!user) {
+      throw new Error('No account found with this email');
+    }
+
+    const token = uuidv4();
+    const tokenId = uuidv4();
+    const now = Date.now();
+    const expiresAt = now + (60 * 60 * 1000); // 1 hour
+
+    db.prepare(`
+      INSERT INTO password_reset_tokens (id, user_id, token, expires_at, created_at)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(tokenId, user.id, token, expiresAt, now);
+
+    return token;
+  }
+
+  /**
+   * Verify password reset token
+   */
+  async verifyResetToken(token: string): Promise<string> {
+    const resetToken = db.prepare(`
+      SELECT user_id, expires_at, used FROM password_reset_tokens 
+      WHERE token = ?
+    `).get(token) as any;
+
+    if (!resetToken) {
+      throw new Error('Invalid reset token');
+    }
+
+    if (resetToken.used) {
+      throw new Error('Reset token already used');
+    }
+
+    if (Date.now() > resetToken.expires_at) {
+      throw new Error('Reset token expired');
+    }
+
+    return resetToken.user_id;
+  }
+
+  /**
+   * Reset password
+   */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const userId = await this.verifyResetToken(token);
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    const now = Date.now();
+
+    db.prepare(`
+      UPDATE users 
+      SET password_hash = ?, updated_at = ?
+      WHERE id = ?
+    `).run(passwordHash, now, userId);
+
+    // Mark token as used
+    db.prepare(`
+      UPDATE password_reset_tokens 
+      SET used = 1
+      WHERE token = ?
+    `).run(token);
+
+    console.log(`✅ Password reset for user: ${userId}`);
+  }
+
+  /**
+   * Get user by email
+   */
+  async getUserByEmail(email: string): Promise<User | null> {
+    const user = db.prepare(`
+      SELECT id, username, email, full_name, grade, age, role, created_at
+      FROM users WHERE email = ?
+    `).get(email) as any;
+
+    return user || null;
+  }
 }
 
 export const authService = new AuthService();

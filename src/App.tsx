@@ -5,6 +5,7 @@ import { ProjectsPage } from './pages/ProjectsPage';
 import { EditorPage } from './pages/EditorPage';
 import { PythonIDEPage } from './pages/PythonIDEPage';
 import { SharedProjectPage } from './pages/SharedProjectPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 
 // Protected route wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -54,6 +55,9 @@ export const App: React.FC = () => {
         
         {/* Shared project view - no auth required */}
         <Route path="/share/:projectId" element={<SharedProjectPage />} />
+        
+        {/* Password reset - no auth required */}
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         
         {/* Projects - requires auth */}
         <Route 
