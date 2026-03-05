@@ -246,7 +246,7 @@ export const ProjectsPage: React.FC = () => {
         
         <div className="page-header">
           <h1 className="page-title">My Projects</h1>
-          <button className="new-project-button" onClick={handleNewProject}>
+          <button className="new-project-button" onClick={() => setIsCreating(true)}>
             <span className="button-icon">+</span>
             <span className="button-text">New Project</span>
           </button>
@@ -381,6 +381,25 @@ export const ProjectsPage: React.FC = () => {
                 <span>All Projects</span>
               )}
             </div>
+
+            {isCreating && (
+              <form onSubmit={handleCreateProject} className="create-project-form">
+                <input
+                  type="text"
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  placeholder="Enter project name..."
+                  autoFocus
+                />
+                <button type="submit">Create</button>
+                <button type="button" onClick={() => {
+                  setIsCreating(false);
+                  setNewProjectName('');
+                }}>
+                  Cancel
+                </button>
+              </form>
+            )}
 
             {isLoading ? (
               <div className="loading">Loading projects...</div>
