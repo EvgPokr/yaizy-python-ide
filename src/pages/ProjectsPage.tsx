@@ -210,7 +210,7 @@ export const ProjectsPage: React.FC = () => {
           </div>
           <button className="new-project-button" onClick={handleNewProject}>
             <span className="button-icon">+</span>
-            <span className="button-text">New Project</span>
+            <span className="button-text">Open a new project</span>
           </button>
         </div>
         <div className="header-right">
@@ -248,7 +248,7 @@ export const ProjectsPage: React.FC = () => {
           <h1 className="page-title">My Projects</h1>
           <button className="new-project-button" onClick={() => setIsCreating(true)}>
             <span className="button-icon">+</span>
-            <span className="button-text">New Project</span>
+            <span className="button-text">Create a new project</span>
           </button>
         </div>
         
