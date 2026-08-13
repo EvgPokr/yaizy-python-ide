@@ -1,6 +1,7 @@
 import { WebSocket, WebSocketServer } from 'ws';
 import { IncomingMessage } from 'http';
 import { SessionManager } from '../services/SessionManager.js';
+import { authService } from '../services/AuthService';
 
 interface CanvasClient {
   sessionId: string;
@@ -15,6 +16,22 @@ export function handleCanvasWebSocket(
 ) {
   wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
     const url = req.url || '';
+    const urlObj = new URL(url, 'http://localhost');
+    const token = urlObj.searchParams.get('token');
+
+    if (!token) {
+      ws.close(1008, 'Unauthorized');
+      return;
+    }
+
+    let decoded: { userId: string; username: string; role: string };
+    try {
+      decoded = authService.verifyToken(token);
+    } catch {
+      ws.close(1008, 'Unauthorized');
+      return;
+    }
+
     const sessionIdMatch = url.match(/\/api\/sessions\/([^\/]+)\/canvas/);
     
     if (!sessionIdMatch) {
@@ -23,6 +40,18 @@ export function handleCanvasWebSocket(
     }
 
     const sessionId = sessionIdMatch[1];
+
+    const session = sessionManager.getSession(sessionId);
+    if (!session) {
+      ws.close(1008, 'Session not found');
+      return;
+    }
+
+    if (session.ownerUserId !== decoded.userId) {
+      ws.close(1008, 'Forbidden');
+      return;
+    }
+
     console.log(`Canvas WebSocket connection for session ${sessionId}`);
 
     // Add client to session's canvas clients
@@ -57,7 +86,7 @@ export function handleCanvasWebSocket(
  */
 export function broadcastCanvasUpdate(
   sessionId: string,
-  type: 'canvas_update' | 'canvas_complete' | 'canvas_clear',
+  type: 'canvas_update' | 'canvas_complete' | 'canvas_clear' | 'turtle_command',
   imageBase64?: string
 ) {
   const clients = canvasClients.get(sessionId);

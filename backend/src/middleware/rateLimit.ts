@@ -12,22 +12,22 @@ export const apiLimiter = rateLimit({
 });
 
 /**
- * Session creation rate limiter (effectively disabled)
+ * Session creation rate limiter
  */
 export const sessionCreationLimiter = rateLimit({
-  windowMs: 60000, // 1 minute
-  max: 999999, // Effectively unlimited
+  windowMs: parseInt(process.env.SESSION_CREATE_RATE_LIMIT_WINDOW_MS || '60000', 10),
+  max: parseInt(process.env.SESSION_CREATE_RATE_LIMIT_MAX || '20', 10),
   message: 'Too many session creation requests, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 /**
- * Code execution rate limiter (disabled for unlimited executions)
+ * Code execution rate limiter
  */
 export const executionLimiter = rateLimit({
-  windowMs: 1000, // 1 second
-  max: 999999, // Unlimited executions
+  windowMs: parseInt(process.env.EXECUTION_RATE_LIMIT_WINDOW_MS || '10000', 10),
+  max: parseInt(process.env.EXECUTION_RATE_LIMIT_MAX || '30', 10),
   message: 'Please wait before executing code again.',
   standardHeaders: true,
   legacyHeaders: false,

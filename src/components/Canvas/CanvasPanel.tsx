@@ -83,11 +83,17 @@ export const CanvasPanel = forwardRef<CanvasPanelRef, CanvasPanelProps>(({ sessi
   useEffect(() => {
     if (!sessionId) return;
 
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      console.error('Canvas WebSocket auth token is missing');
+      return;
+    }
+
     // Connect to canvas WebSocket
     // Use current host in production, localhost in development
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/api/sessions/${sessionId}/canvas`;
+    const wsUrl = `${protocol}//${host}/api/sessions/${sessionId}/canvas?token=${encodeURIComponent(token)}`;
     
     console.log('Connecting to canvas WebSocket:', wsUrl);
     const ws = new WebSocket(wsUrl);

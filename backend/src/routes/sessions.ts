@@ -1,29 +1,32 @@
 import { Router, Request, Response } from 'express';
 import { SessionManager } from '../services/SessionManager';
 import {
-  SessionCreateRequest,
   SessionCreateResponse,
   RunCodeRequest,
   RunCodeResponse,
   StopExecutionResponse,
 } from '../types/session';
 import { sessionCreationLimiter, executionLimiter } from '../middleware/rateLimit';
+import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 export function createSessionRouter(sessionManager: SessionManager): Router {
   const router = Router();
+  router.use(authMiddleware);
 
   /**
    * POST /api/sessions
    * Create a new Python session
    */
-  router.post('/', sessionCreationLimiter, async (req: Request, res: Response) => {
+  router.post('/', sessionCreationLimiter, async (req: AuthRequest, res: Response) => {
     try {
-      const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
-      const body: SessionCreateRequest = req.body;
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
 
+      const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
       console.log(`Creating session for IP: ${ipAddress}`);
 
-      const session = await sessionManager.createSession(ipAddress);
+      const session = await sessionManager.createSession(ipAddress, req.userId);
 
       const response: SessionCreateResponse = {
         sessionId: session.id,
@@ -44,10 +47,27 @@ export function createSessionRouter(sessionManager: SessionManager): Router {
    * GET /api/sessions/:id
    * Get session info
    */
-  router.get('/:id', (req: Request, res: Response) => {
+  router.get('/stats', (req: Request, res: Response) => {
     try {
+      const stats = sessionManager.getStats();
+      res.json(stats);
+    } catch (error: any) {
+      console.error('Failed to get stats:', error);
+      res.status(500).json({
+        error: 'Failed to get stats',
+        message: error.message,
+      });
+    }
+  });
+
+  router.get('/:id', (req: AuthRequest, res: Response) => {
+    try {
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
       const sessionId = req.params.id;
-      const session = sessionManager.getSession(sessionId);
+      const session = sessionManager.getOwnedSession(sessionId, req.userId);
 
       if (!session) {
         return res.status(404).json({ error: 'Session not found' });
@@ -73,8 +93,12 @@ export function createSessionRouter(sessionManager: SessionManager): Router {
    * POST /api/sessions/:id/run
    * Execute Python code in session
    */
-  router.post('/:id/run', executionLimiter, async (req: Request, res: Response) => {
+  router.post('/:id/run', executionLimiter, async (req: AuthRequest, res: Response) => {
     try {
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
       const sessionId = req.params.id;
       const body: RunCodeRequest = req.body;
 
@@ -82,7 +106,7 @@ export function createSessionRouter(sessionManager: SessionManager): Router {
         return res.status(400).json({ error: 'Code is required' });
       }
 
-      const session = sessionManager.getSession(sessionId);
+      const session = sessionManager.getOwnedSession(sessionId, req.userId);
       if (!session) {
         return res.status(404).json({ error: 'Session not found' });
       }
@@ -93,14 +117,7 @@ export function createSessionRouter(sessionManager: SessionManager): Router {
 
       const filename = body.filename || 'main.py';
 
-      // Execute code (async, results will be streamed via WebSocket)
-      sessionManager.executeCode(sessionId, body.code, filename)
-        .then(() => {
-          console.log(`Code execution completed for session ${sessionId}`);
-        })
-        .catch((error) => {
-          console.error(`Code execution failed for session ${sessionId}:`, error);
-        });
+      await sessionManager.executeCode(sessionId, body.code, filename);
 
       const response: RunCodeResponse = {
         success: true,
@@ -110,6 +127,12 @@ export function createSessionRouter(sessionManager: SessionManager): Router {
       res.json(response);
     } catch (error: any) {
       console.error('Failed to run code:', error);
+      if (error?.message === 'Invalid filename' || error?.message === 'Invalid filename format') {
+        return res.status(400).json({
+          error: 'Invalid request',
+          message: error.message,
+        });
+      }
       res.status(500).json({
         error: 'Failed to run code',
         message: error.message,
@@ -121,11 +144,15 @@ export function createSessionRouter(sessionManager: SessionManager): Router {
    * POST /api/sessions/:id/stop
    * Stop current execution
    */
-  router.post('/:id/stop', (req: Request, res: Response) => {
+  router.post('/:id/stop', (req: AuthRequest, res: Response) => {
     try {
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
       const sessionId = req.params.id;
 
-      const session = sessionManager.getSession(sessionId);
+      const session = sessionManager.getOwnedSession(sessionId, req.userId);
       if (!session) {
         return res.status(404).json({ error: 'Session not found' });
       }
@@ -151,11 +178,15 @@ export function createSessionRouter(sessionManager: SessionManager): Router {
    * POST /api/sessions/:id/reset
    * Reset session (kill and recreate)
    */
-  router.post('/:id/reset', async (req: Request, res: Response) => {
+  router.post('/:id/reset', async (req: AuthRequest, res: Response) => {
     try {
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
       const sessionId = req.params.id;
 
-      const oldSession = sessionManager.getSession(sessionId);
+      const oldSession = sessionManager.getOwnedSession(sessionId, req.userId);
       if (!oldSession) {
         return res.status(404).json({ error: 'Session not found' });
       }
@@ -180,9 +211,17 @@ export function createSessionRouter(sessionManager: SessionManager): Router {
    * DELETE /api/sessions/:id
    * Delete a session
    */
-  router.delete('/:id', async (req: Request, res: Response) => {
+  router.delete('/:id', async (req: AuthRequest, res: Response) => {
     try {
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
       const sessionId = req.params.id;
+      const session = sessionManager.getOwnedSession(sessionId, req.userId);
+      if (!session) {
+        return res.status(404).json({ error: 'Session not found' });
+      }
 
       await sessionManager.deleteSession(sessionId);
 
@@ -194,23 +233,6 @@ export function createSessionRouter(sessionManager: SessionManager): Router {
       console.error('Failed to delete session:', error);
       res.status(500).json({
         error: 'Failed to delete session',
-        message: error.message,
-      });
-    }
-  });
-
-  /**
-   * GET /api/sessions/stats
-   * Get session statistics
-   */
-  router.get('/stats', (req: Request, res: Response) => {
-    try {
-      const stats = sessionManager.getStats();
-      res.json(stats);
-    } catch (error: any) {
-      console.error('Failed to get stats:', error);
-      res.status(500).json({
-        error: 'Failed to get stats',
         message: error.message,
       });
     }

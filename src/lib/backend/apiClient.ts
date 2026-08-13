@@ -49,15 +49,26 @@ class APIClient {
     this.baseUrl = baseUrl;
   }
 
+  private getAuthHeaders(): HeadersInit {
+    const token = localStorage.getItem('auth_token');
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return headers;
+  }
+
   /**
    * Create a new session
    */
   async createSession(): Promise<SessionCreateResponse> {
     const response = await fetch(`${this.baseUrl}/api/sessions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: this.getAuthHeaders(),
       body: JSON.stringify({}),
     });
 
@@ -73,7 +84,9 @@ class APIClient {
    * Get session info
    */
   async getSession(sessionId: string): Promise<SessionInfo> {
-    const response = await fetch(`${this.baseUrl}/api/sessions/${sessionId}`);
+    const response = await fetch(`${this.baseUrl}/api/sessions/${sessionId}`, {
+      headers: this.getAuthHeaders(),
+    });
 
     if (!response.ok) {
       const error = await response.json();
@@ -90,9 +103,7 @@ class APIClient {
     try {
       const response = await fetch(`${this.baseUrl}/api/sessions/${sessionId}/run`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: this.getAuthHeaders(),
         body: JSON.stringify(request),
       });
 
@@ -121,6 +132,7 @@ class APIClient {
   async stopExecution(sessionId: string): Promise<StopExecutionResponse> {
     const response = await fetch(`${this.baseUrl}/api/sessions/${sessionId}/stop`, {
       method: 'POST',
+      headers: this.getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -137,6 +149,7 @@ class APIClient {
   async resetSession(sessionId: string): Promise<SessionCreateResponse> {
     const response = await fetch(`${this.baseUrl}/api/sessions/${sessionId}/reset`, {
       method: 'POST',
+      headers: this.getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -153,6 +166,7 @@ class APIClient {
   async deleteSession(sessionId: string): Promise<void> {
     const response = await fetch(`${this.baseUrl}/api/sessions/${sessionId}`, {
       method: 'DELETE',
+      headers: this.getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -165,7 +179,9 @@ class APIClient {
    * Health check
    */
   async healthCheck(): Promise<HealthCheckResponse> {
-    const response = await fetch(`${this.baseUrl}/health`);
+    const response = await fetch(`${this.baseUrl}/health`, {
+      headers: this.getAuthHeaders(),
+    });
 
     if (!response.ok) {
       throw new Error('Health check failed');
@@ -178,17 +194,24 @@ class APIClient {
    * Get WebSocket URL
    */
   getWebSocketUrl(sessionId: string): string {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    const encodedToken = encodeURIComponent(token);
+
     // In production (baseUrl is empty), use current host
     if (!this.baseUrl) {
       const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
       const host = window.location.host;
-      return `${wsProtocol}://${host}/api/sessions/${sessionId}/terminal`;
+      return `${wsProtocol}://${host}/api/sessions/${sessionId}/terminal?token=${encodedToken}`;
     }
     
     // In development, use configured baseUrl
     const wsProtocol = this.baseUrl.startsWith('https') ? 'wss' : 'ws';
     const baseUrl = this.baseUrl.replace(/^https?:\/\//, '');
-    return `${wsProtocol}://${baseUrl}/api/sessions/${sessionId}/terminal`;
+    return `${wsProtocol}://${baseUrl}/api/sessions/${sessionId}/terminal?token=${encodedToken}`;
   }
 }
 

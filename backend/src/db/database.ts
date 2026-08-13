@@ -67,7 +67,7 @@ export function initDatabase() {
 
   // Migrate existing users table
   try {
-    const userColumns = db.pragma('table_info(users)');
+    const userColumns = db.pragma('table_info(users)') as Array<{ name: string }>;
     const userColumnNames = userColumns.map((col: any) => col.name);
     
     if (!userColumnNames.includes('grade')) {
@@ -85,7 +85,7 @@ export function initDatabase() {
 
   // Migrate existing projects table
   try {
-    const columns = db.pragma('table_info(projects)');
+    const columns = db.pragma('table_info(projects)') as Array<{ name: string }>;
     const columnNames = columns.map((col: any) => col.name);
     
     if (!columnNames.includes('is_public')) {
@@ -132,20 +132,22 @@ export function initDatabase() {
     )
   `);
 
-  // Create default demo account if not exists
-  const defaultUser = db.prepare('SELECT id FROM users WHERE username = ?').get('demo');
-  if (!defaultUser) {
-    const bcrypt = require('bcrypt');
-    const defaultPassword = bcrypt.hashSync('demo123', 10);
-    const userId = require('uuid').v4();
-    const now = Date.now();
-    
-    db.prepare(`
-      INSERT INTO users (id, username, password_hash, full_name, role, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(userId, 'demo', defaultPassword, 'Demo User', 'user', now, now);
-    
-    console.log('✅ Default demo account created (username: demo, password: demo123)');
+  // Create default demo account only when explicitly enabled
+  if (process.env.ENABLE_DEMO_ACCOUNT === 'true') {
+    const defaultUser = db.prepare('SELECT id FROM users WHERE username = ?').get('demo');
+    if (!defaultUser) {
+      const bcrypt = require('bcrypt');
+      const defaultPassword = bcrypt.hashSync('demo123', 10);
+      const userId = require('uuid').v4();
+      const now = Date.now();
+
+      db.prepare(`
+        INSERT INTO users (id, username, password_hash, full_name, role, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(userId, 'demo', defaultPassword, 'Demo User', 'user', now, now);
+
+      console.log('✅ Demo account created (ENABLE_DEMO_ACCOUNT=true)');
+    }
   }
 
   console.log('✅ Database initialized');
