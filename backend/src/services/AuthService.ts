@@ -3,8 +3,12 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/database';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = '7d';
+
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error('JWT_SECRET must be set and at least 32 characters long');
+}
 
 export interface User {
   id: string;
@@ -27,17 +31,12 @@ export class AuthService {
    * Login with username and password
    */
   async login(username: string, password: string): Promise<LoginResult> {
-    console.log('Login attempt for username:', username);
-    
     const user = db.prepare(`
       SELECT id, username, password_hash, email, full_name, grade, age, role, created_at
       FROM users WHERE username = ?
     `).get(username) as any;
 
-    console.log('User found:', user ? 'yes' : 'no');
-
     if (!user) {
-      console.log('Available users:', db.prepare('SELECT username FROM users').all());
       throw new Error('Invalid username or password');
     }
 

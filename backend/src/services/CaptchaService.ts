@@ -4,6 +4,12 @@
 
 const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET_KEY || '';
 
+interface IRecaptchaResponse {
+  success: boolean;
+  score?: number;
+  'error-codes'?: string[];
+}
+
 export class CaptchaService {
   /**
    * Verify reCAPTCHA token
@@ -28,7 +34,7 @@ export class CaptchaService {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as IRecaptchaResponse;
       
       if (!data.success) {
         console.error('reCAPTCHA verification failed:', data['error-codes']);

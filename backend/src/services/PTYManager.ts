@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import Docker from 'dockerode';
-import { Stream } from 'stream';
+import { Duplex } from 'stream';
 
 export interface PTYOptions {
   cols?: number;
@@ -12,7 +12,7 @@ export interface PTYOptions {
 
 interface PTYSession {
   exec: Docker.Exec;
-  stream: Stream;
+  stream: Duplex;
   containerId: string;
   workspaceDir: string;
 }
@@ -92,7 +92,7 @@ export class PTYManager {
   /**
    * Get stream for a session
    */
-  getStream(sessionId: string): Stream | undefined {
+  getStream(sessionId: string): Duplex | undefined {
     return this.ptySessions.get(sessionId)?.stream;
   }
 
@@ -141,13 +141,15 @@ export class PTYManager {
       // Clear any existing timeout
       this.clearExecutionTimeout(sessionId);
 
+      const safeFilename = this.validateFilename(filename);
+
       // Write code to file in workspace directory (mounted in Docker)
-      const filePath = path.join(session.workspaceDir, filename);
+      const filePath = path.join(session.workspaceDir, safeFilename);
       await fs.writeFile(filePath, code, 'utf-8');
       console.log(`Code written to ${filePath} for session ${sessionId}`);
 
       // Run Python command (wrapper handles all technical setup)
-      this.write(sessionId, `/usr/local/bin/run_python.sh /workspace/${filename}\n`);
+      this.write(sessionId, `/usr/local/bin/run_python.sh /workspace/${safeFilename}\n`);
 
       // Set execution timeout
       const timeout = setTimeout(() => {
@@ -256,5 +258,20 @@ export class PTYManager {
    */
   getActiveCount(): number {
     return this.ptySessions.size;
+  }
+
+  private validateFilename(filename: string): string {
+    const trimmed = (filename || '').trim();
+    const base = path.basename(trimmed);
+
+    if (!base || base !== trimmed) {
+      throw new Error('Invalid filename');
+    }
+
+    if (!/^[a-zA-Z0-9._-]{1,64}\.py$/.test(base)) {
+      throw new Error('Invalid filename format');
+    }
+
+    return base;
   }
 }

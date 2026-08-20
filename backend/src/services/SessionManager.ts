@@ -21,10 +21,9 @@ export class SessionManager {
     this.ptyManager = new PTYManager();
     
     // Configuration from environment
-    // Set to 24 hours (86400000 ms) - effectively unlimited while browser is open
     this.SESSION_TIMEOUT_MS = parseInt(process.env.SESSION_TIMEOUT_MS || '86400000', 10);
-    this.MAX_SESSIONS_PER_IP = parseInt(process.env.MAX_SESSIONS_PER_IP || '999999', 10); // Effectively unlimited
-    this.MAX_EXECUTIONS_PER_HOUR = parseInt(process.env.MAX_EXECUTIONS_PER_HOUR || '999999', 10); // Effectively unlimited
+    this.MAX_SESSIONS_PER_IP = parseInt(process.env.MAX_SESSIONS_PER_IP || '10', 10);
+    this.MAX_EXECUTIONS_PER_HOUR = parseInt(process.env.MAX_EXECUTIONS_PER_HOUR || '1000', 10);
     this.WORKSPACE_BASE_DIR = process.env.WORKSPACE_BASE_DIR || '/tmp/python-sessions';
 
     // Start cleanup interval
@@ -34,7 +33,7 @@ export class SessionManager {
   /**
    * Create a new Python session
    */
-  async createSession(ipAddress: string): Promise<PythonSession> {
+  async createSession(ipAddress: string, ownerUserId: string): Promise<PythonSession> {
     // Check rate limits
     this.checkRateLimits(ipAddress);
 
@@ -59,6 +58,7 @@ export class SessionManager {
         id: sessionId,
         containerId,
         ptySessionId: sessionId,
+        ownerUserId,
         workspaceDir,
         createdAt: new Date(),
         lastActivityAt: new Date(),
@@ -90,6 +90,13 @@ export class SessionManager {
     return session;
   }
 
+  getOwnedSession(sessionId: string, ownerUserId: string): PythonSession | undefined {
+    const session = this.getSession(sessionId);
+    if (!session) return undefined;
+    if (session.ownerUserId !== ownerUserId) return undefined;
+    return session;
+  }
+
   /**
    * Execute code in a session
    */
@@ -103,8 +110,7 @@ export class SessionManager {
       throw new Error(`Session ${sessionId} not found`);
     }
 
-    // Check execution rate limit (disabled for unlimited executions)
-    // this.checkExecutionRateLimit(session.ipAddress);
+    this.checkExecutionRateLimit(session.ipAddress);
 
     // If already running, stop previous execution first
     if (session.isRunning) {
@@ -170,12 +176,13 @@ export class SessionManager {
     }
 
     const ipAddress = oldSession.ipAddress;
+    const ownerUserId = oldSession.ownerUserId;
 
     // Delete old session
     await this.deleteSession(sessionId);
 
     // Create new session
-    return await this.createSession(ipAddress);
+    return await this.createSession(ipAddress, ownerUserId);
   }
 
   /**

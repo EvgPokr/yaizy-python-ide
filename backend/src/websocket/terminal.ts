@@ -4,6 +4,7 @@ import { SessionManager } from '../services/SessionManager';
 import { PTYManager } from '../services/PTYManager';
 import { WebSocketMessage } from '../types/session';
 import { broadcastCanvasUpdate } from './canvas.js';
+import { authService } from '../services/AuthService';
 
 export class TerminalWebSocketHandler {
   private wss: WebSocketServer;
@@ -32,6 +33,22 @@ export class TerminalWebSocketHandler {
   private handleConnection(ws: WebSocket, request: IncomingMessage): void {
     // Extract session ID from URL path
     const url = request.url || '';
+    const urlObj = new URL(url, 'http://localhost');
+    const token = urlObj.searchParams.get('token');
+
+    if (!token) {
+      ws.close(1008, 'Unauthorized');
+      return;
+    }
+
+    let decoded: { userId: string; username: string; role: string };
+    try {
+      decoded = authService.verifyToken(token);
+    } catch {
+      ws.close(1008, 'Unauthorized');
+      return;
+    }
+
     const match = url.match(/\/api\/sessions\/([^/]+)\/terminal/);
     
     if (!match) {
@@ -46,6 +63,11 @@ export class TerminalWebSocketHandler {
     const session = this.sessionManager.getSession(sessionId);
     if (!session || !session.ptySessionId) {
       ws.close(1008, 'Session not found');
+      return;
+    }
+
+    if (session.ownerUserId !== decoded.userId) {
+      ws.close(1008, 'Forbidden');
       return;
     }
 

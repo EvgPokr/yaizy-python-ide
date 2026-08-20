@@ -2,6 +2,7 @@ export interface PythonSession {
   id: string;
   containerId: string | null;
   ptySessionId: string | null;
+  ownerUserId: string;
   workspaceDir: string;
   createdAt: Date;
   lastActivityAt: Date;

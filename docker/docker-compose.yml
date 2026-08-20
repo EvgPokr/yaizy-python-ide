@@ -11,6 +11,8 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3001
+      - JWT_SECRET=${JWT_SECRET:-dev-only-change-me-please-12345678901234567890}
+      - ENABLE_DEMO_ACCOUNT=${ENABLE_DEMO_ACCOUNT:-false}
       - FRONTEND_URL=http://localhost:5173
       - DOCKER_IMAGE=python-sandbox:latest
       - WORKSPACE_BASE_DIR=/tmp/python-sessions
