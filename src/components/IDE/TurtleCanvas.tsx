@@ -3,13 +3,11 @@ import React, { useRef, useEffect } from 'react';
 interface TurtleCanvasProps {
   width?: number;
   height?: number;
-  onClear?: () => void;
 }
 
 export const TurtleCanvas: React.FC<TurtleCanvasProps> = ({
   width = 600,
   height = 400,
-  onClear,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -41,18 +39,6 @@ export const TurtleCanvas: React.FC<TurtleCanvasProps> = ({
     
     console.log('[TurtleCanvas] Canvas exposed to window');
   }, [width, height]);
-
-  const handleClear = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, width, height);
-    onClear?.();
-  };
 
   return (
     <canvas

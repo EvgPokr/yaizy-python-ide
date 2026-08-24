@@ -5,7 +5,8 @@ import { ProjectsPage } from './pages/ProjectsPage';
 import { EditorPage } from './pages/EditorPage';
 import { PythonIDEPage } from './pages/PythonIDEPage';
 import { SharedProjectPage } from './pages/SharedProjectPage';
-import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { AuthCallbackPage } from './pages/AuthCallbackPage';
+import { LoginPlaceholderPage } from './pages/LoginPlaceholderPage';
 
 // Protected route wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -31,12 +32,33 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
 
   if (!isAuthenticated) {
-    // Redirect to home with message
-    alert('Please login to access projects');
+    // Redirect to home placeholder
     return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
+};
+
+// Home route: shows the editor when authenticated, otherwise a login placeholder
+const HomeRoute: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuthStore();
+
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        fontSize: '18px',
+        color: '#999',
+      }}>
+        Loading...
+      </div>
+    );
+  }
+
+  return isAuthenticated ? <PythonIDEPage /> : <LoginPlaceholderPage />;
 };
 
 export const App: React.FC = () => {
@@ -50,15 +72,15 @@ export const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Main editor - no auth required (guest mode) */}
-        <Route path="/" element={<PythonIDEPage />} />
+        {/* Main editor when authenticated, login placeholder otherwise */}
+        <Route path="/" element={<HomeRoute />} />
         
         {/* Shared project view - no auth required */}
         <Route path="/share/:projectId" element={<SharedProjectPage />} />
-        
-        {/* Password reset - no auth required */}
-        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-        
+
+        {/* OAuth callback - completes the YaizY login flow */}
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+
         {/* Projects - requires auth */}
         <Route 
           path="/projects" 

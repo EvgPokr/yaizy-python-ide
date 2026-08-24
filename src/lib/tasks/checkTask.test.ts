@@ -408,7 +408,7 @@ greet()`;
 
       const result = checkTask(task, 'print("Hello")', 'Hello');
 
-      expect(result.feedback).toContain('Отлично');
+      expect(result.feedback).toContain('Excellent');
       expect(result.feedback).toContain('🎉');
     });
 
