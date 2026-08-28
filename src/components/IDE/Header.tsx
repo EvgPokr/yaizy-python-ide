@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { PyodideStatus } from '@/types';
 import { useAuthStore } from '@/store/authStore';
@@ -9,7 +9,6 @@ import { projectStorage } from '@/lib/storage/projectStorage';
 import { LoginDropdown } from '../Auth/LoginDropdown';
 import { ProfileDropdown } from '../Auth/ProfileDropdown';
 import { ShareButton } from '../Share/ShareButton';
-import { ForgotPasswordDialog } from '../Auth/ForgotPasswordDialog';
 
 interface HeaderProps {
   onRun: () => void;
@@ -72,24 +71,13 @@ export const Header: React.FC<HeaderProps> = ({
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
   const { projectMeta, updateIsPublic } = useProjectMetaStore();
-  const { project, updateFileContent } = useIDEStore();
+  const { project } = useIDEStore();
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showFileMenu, setShowFileMenu] = useState(false);
   const [isEditingProjectName, setIsEditingProjectName] = useState(false);
   const [editingName, setEditingName] = useState('');
-  const [showForgotPasswordDialog, setShowForgotPasswordDialog] = useState(false);
-
-  useEffect(() => {
-    const handleOpenForgotPassword = () => {
-      setShowForgotPasswordDialog(true);
-    };
-
-    window.addEventListener('openForgotPassword', handleOpenForgotPassword);
-    return () => window.removeEventListener('openForgotPassword', handleOpenForgotPassword);
-  }, []);
-
-  const handleImportClick = () => {
+    const handleImportClick = () => {
     fileInputRef.current?.click();
   };
 
@@ -386,9 +374,6 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {showForgotPasswordDialog && (
-        <ForgotPasswordDialog onClose={() => setShowForgotPasswordDialog(false)} />
-      )}
     </header>
   );
 };

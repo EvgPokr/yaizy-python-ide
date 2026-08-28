@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { projectsClient, Project } from '@/lib/api/projectsClient';
+import { projectsClient } from '@/lib/api/projectsClient';
 import { BackendLayout } from '@/components/IDE/BackendLayout';
 import { useIDEStore } from '@/store/ideStore';
 import { useProjectSync } from '@/hooks/useProjectSync';
