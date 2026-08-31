@@ -110,7 +110,6 @@ jobs:
           host: ${{ vars.HOST }}
           username: ${{ vars.HOST_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          ignore_known_hosts: true
           script_stop: true
           envs: GHCR_USER,GHCR_PULL_TOKEN,JWT_SECRET,YAIZY_OAUTH_AUTHORIZE_URL,YAIZY_OAUTH_TOKEN_URL,YAIZY_OAUTH_REDIRECT_URI,YAIZY_OAUTH_CLIENT_ID,YAIZY_OAUTH_CLIENT_SECRET,YAIZY_OAUTH_JWT_SECRET,YAIZY_OAUTH_ISSUER
           script: |
