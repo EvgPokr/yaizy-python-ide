@@ -26,8 +26,8 @@ export const AuthCallbackPage: React.FC = () => {
 
     completeOAuthLogin(result.token!)
       .then(() => {
-        // Clean the token from the URL, then continue to projects
-        navigate('/projects', { replace: true });
+        // Clean the token from the URL, then continue to the post-login target
+        navigate(result.redirect || '/projects', { replace: true });
       })
       .catch((e) => {
         setError(e.message || 'Login failed');

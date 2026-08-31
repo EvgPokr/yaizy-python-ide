@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 
 import { authService } from '../services/AuthService';
-import { oauthService } from '../services/OAuthService';
+import { oauthService, isSafeRedirect } from '../services/OAuthService';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = Router();
@@ -17,7 +17,8 @@ function frontendUrl(path: string): string {
  */
 router.get('/yaizy/login', (req: Request, res: Response) => {
   try {
-    const { authorizeUrl } = oauthService.createAuthRequest();
+    const redirect = isSafeRedirect(req.query.redirect as string | undefined);
+    const { authorizeUrl } = oauthService.createAuthRequest(redirect);
     res.redirect(authorizeUrl);
   } catch (error: any) {
     console.error('OAuth login error:', error);
@@ -64,7 +65,8 @@ router.get('/yaizy/callback', async (req: Request, res: Response) => {
     const token = authService.issueTokenForUser(user);
 
     // Token is passed via URL fragment so it never reaches server logs.
-    return res.redirect(frontendUrl(`/auth/callback#token=${token}`));
+    const redirect = encodeURIComponent(pendingRequest.redirect);
+    return res.redirect(frontendUrl(`/auth/callback?redirect=${redirect}#token=${token}`));
   } catch (error: any) {
     console.error('OAuth callback error:', error);
     return res.redirect(

@@ -15,11 +15,30 @@ export interface PendingAuthRequest {
   state: string;
   codeVerifier: string;
   createdAt: number;
+  redirect: string;
 }
 
 export interface AccessTokenPayload {
   sub: string;
   role: string;
+}
+
+export const DEFAULT_REDIRECT = '/projects';
+
+/**
+ * Only allow same-origin relative app paths as a post-login redirect.
+ * Rejects absolute URLs, protocol-relative URLs and any other host, so the
+ * fragment token can never be leaked to a third-party origin.
+ */
+export function isSafeRedirect(path: string | undefined): string {
+  const candidate = path || DEFAULT_REDIRECT;
+  if (candidate.startsWith('//')) {
+    return DEFAULT_REDIRECT;
+  }
+  if (!/^\/[A-Za-z0-9\-._~/]*$/.test(candidate)) {
+    return DEFAULT_REDIRECT;
+  }
+  return candidate;
 }
 
 const STATE_TTL_MS = 10 * 60 * 1000;
@@ -66,7 +85,7 @@ export class OAuthService {
     }
   }
 
-  createAuthRequest(): { state: string; authorizeUrl: string } {
+  createAuthRequest(redirect?: string): { state: string; authorizeUrl: string } {
     this.cleanupExpired();
 
     const state = crypto.randomBytes(32).toString('base64url');
@@ -80,6 +99,7 @@ export class OAuthService {
       state,
       codeVerifier,
       createdAt: Date.now(),
+      redirect: redirect || DEFAULT_REDIRECT,
     });
 
     const config = this.getConfig();

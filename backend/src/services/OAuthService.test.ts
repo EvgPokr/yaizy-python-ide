@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { OAuthService } from './OAuthService';
+import { OAuthService, DEFAULT_REDIRECT, isSafeRedirect } from './OAuthService';
 
 const JWT_SECRET = 'test-shared-oauth-jwt-secret-0123456789';
 
@@ -102,6 +102,42 @@ describe('OAuthService', () => {
         .update(pending.codeVerifier)
         .digest('base64url');
       expect(computed).toBe(challenge);
+    });
+
+    it('defaults the post-login redirect to /projects', () => {
+      const { state } = service.createAuthRequest();
+      const pending = service.consumeAuthRequest(state)!;
+      expect(pending.redirect).toBe(DEFAULT_REDIRECT);
+    });
+
+    it('stores the provided post-login redirect', () => {
+      const { state } = service.createAuthRequest('/editor/42');
+      const pending = service.consumeAuthRequest(state)!;
+      expect(pending.redirect).toBe('/editor/42');
+    });
+  });
+
+  describe('isSafeRedirect', () => {
+    it('allows a relative path', () => {
+      expect(isSafeRedirect('/projects')).toBe('/projects');
+      expect(isSafeRedirect('/editor/42')).toBe('/editor/42');
+    });
+
+    it('defaults when path is missing', () => {
+      expect(isSafeRedirect(undefined)).toBe(DEFAULT_REDIRECT);
+      expect(isSafeRedirect('')).toBe(DEFAULT_REDIRECT);
+    });
+
+    it('rejects absolute and protocol-relative URLs', () => {
+      expect(isSafeRedirect('https://evil.example.com')).toBe(DEFAULT_REDIRECT);
+      expect(isSafeRedirect('//evil.example.com')).toBe(DEFAULT_REDIRECT);
+      expect(isSafeRedirect('javascript:alert(1)')).toBe(DEFAULT_REDIRECT);
+    });
+
+    it('rejects paths with a colon, backslash or userinfo', () => {
+      expect(isSafeRedirect('/a:b')).toBe(DEFAULT_REDIRECT);
+      expect(isSafeRedirect('/a\\b')).toBe(DEFAULT_REDIRECT);
+      expect(isSafeRedirect('http://user@host/x')).toBe(DEFAULT_REDIRECT);
     });
   });
 

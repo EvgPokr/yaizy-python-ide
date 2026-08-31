@@ -1,6 +1,25 @@
 export interface OAuthCallbackResult {
   token?: string;
   error?: string;
+  redirect?: string;
+}
+
+const DEFAULT_REDIRECT = '/projects';
+
+/**
+ * Only allow same-origin relative app paths as a post-login redirect.
+ * Rejects absolute URLs, protocol-relative URLs and any other host, so the
+ * fragment token can never be leaked to a third-party origin.
+ */
+export function isSafeRedirect(path: string | undefined): string {
+  const candidate = path || DEFAULT_REDIRECT;
+  if (candidate.startsWith('//')) {
+    return DEFAULT_REDIRECT;
+  }
+  if (!/^\/[A-Za-z0-9\-._~/]*$/.test(candidate)) {
+    return DEFAULT_REDIRECT;
+  }
+  return candidate;
 }
 
 /**
@@ -23,5 +42,6 @@ export function parseOAuthCallback(
     return { error: 'No authentication token received' };
   }
 
-  return { token: decodeURIComponent(tokenMatch[1]) };
+  const redirect = isSafeRedirect(searchParams.get('redirect') ?? undefined);
+  return { token: decodeURIComponent(tokenMatch[1]), redirect };
 }
