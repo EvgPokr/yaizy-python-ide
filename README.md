@@ -185,8 +185,8 @@ There is no local registration, password login, or password reset.
 Flow:
 
 1. User opens the IDE (e.g. via the "Open Python IDE" button in the yaizy
-   student dashboard, which points to the `/oauth/launch` endpoint of the
-   yaizy auth service) — or opens the IDE directly.
+   student dashboard, which points to the `/api/auth2/student/python-ide-launch`
+   endpoint of the yaizy auth service) — or opens the IDE directly.
 2. Without a session, the IDE redirects to the yaizy authorization endpoint
    (`/oauth/authorize`). An already logged-in yaizy user passes silently;
    an unauthenticated user is sent to the yaizy login page first.

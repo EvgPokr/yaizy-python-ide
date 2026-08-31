@@ -89,6 +89,7 @@ export class OAuthService {
     url.searchParams.set('state', state);
     url.searchParams.set('code_challenge', codeChallenge);
     url.searchParams.set('code_challenge_method', 'S256');
+    url.searchParams.set('user_type', 'student');
 
     return { state, authorizeUrl: url.toString() };
   }

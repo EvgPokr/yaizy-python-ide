@@ -1,0 +1,65 @@
+# Shared deployment compose for the YaizY Python IDE.
+# Used for BOTH the test stand and prod — images are pulled from GHCR
+# (built by CI, never built on the host). Environment-specific values
+# (DOMAIN, IMAGE_TAG, REGISTRY) are read from the gitignored docker/.env,
+# which docker compose auto-loads from the directory of this file.
+#
+#   test:  DOMAIN=ide.test.yaizy.io  IMAGE_TAG=test
+#   prod:  DOMAIN=ide.yaizy.io       IMAGE_TAG=prod
+#
+#   docker compose -f docker/docker-compose.deploy.yml up -d
+
+services:
+  # Builds/pulls the python-sandbox image used at runtime by the backend
+  # (backend spawns sandbox containers via host docker.sock).
+  # The dummy container is only so `docker compose pull` fetches it before backend starts.
+  sandbox:
+    image: ${REGISTRY:-ghcr.io/yaizy-io/yaizy-python-ide}/sandbox:${IMAGE_TAG:-test}
+    command: /bin/true
+    restart: "no"
+    networks:
+      - ide-network
+
+  backend:
+    image: ${REGISTRY:-ghcr.io/yaizy-io/yaizy-python-ide}/backend:${IMAGE_TAG:-test}
+    env_file:
+      - ../backend/.env
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DOCKER_IMAGE: ${REGISTRY:-ghcr.io/yaizy-io/yaizy-python-ide}/sandbox:${IMAGE_TAG:-test}
+      WORKSPACE_BASE_DIR: /tmp/python-sessions
+      DB_DIR: /data
+      FRONTEND_URL: https://${DOMAIN}
+      YAIZY_OAUTH_REDIRECT_URI: https://${DOMAIN}/api/auth/oauth/yaizy/callback
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/python-sessions:/tmp/python-sessions
+      - python-ide-data:/data
+    depends_on:
+      - sandbox
+    restart: unless-stopped
+    networks:
+      - ide-network
+
+  nginx:
+    image: ${REGISTRY:-ghcr.io/yaizy-io/yaizy-python-ide}/frontend:${IMAGE_TAG:-test}
+    ports:
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+      NGINX_ENVSUBST_FILTER: ^DOMAIN$
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - ide-network
+
+networks:
+  ide-network:
+    driver: bridge
+
+volumes:
+  python-ide-data:

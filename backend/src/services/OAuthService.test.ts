@@ -72,6 +72,7 @@ describe('OAuthService', () => {
       );
       expect(url.searchParams.get('state')).toBe(state);
       expect(url.searchParams.get('code_challenge_method')).toBe('S256');
+      expect(url.searchParams.get('user_type')).toBe('student');
 
       const challenge = url.searchParams.get('code_challenge')!;
       expect(challenge).toMatch(/^[A-Za-z0-9_-]{43,128}$/);
