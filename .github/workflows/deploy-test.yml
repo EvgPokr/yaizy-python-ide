@@ -60,8 +60,8 @@ jobs:
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ vars.GHCR_USER || 'yaizy-io' }}
-          password: ${{ secrets.GHCR_PUSH_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push backend
         uses: docker/build-push-action@v6
@@ -69,8 +69,8 @@ jobs:
           context: backend
           push: true
           tags: |
-            ghcr.io/${{ vars.REGISTRY_OWNER || 'yaizy-io' }}/yaizy-python-ide/backend:${{ github.ref_name }}
-            ghcr.io/${{ vars.REGISTRY_OWNER || 'yaizy-io' }}/yaizy-python-ide/backend:${{ github.sha }}
+            ghcr.io/EvgPokr/yaizy-python-ide/backend:${{ github.ref_name }}
+            ghcr.io/EvgPokr/yaizy-python-ide/backend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -81,8 +81,8 @@ jobs:
           file: docker/Dockerfile.frontend
           push: true
           tags: |
-            ghcr.io/${{ vars.REGISTRY_OWNER || 'yaizy-io' }}/yaizy-python-ide/frontend:${{ github.ref_name }}
-            ghcr.io/${{ vars.REGISTRY_OWNER || 'yaizy-io' }}/yaizy-python-ide/frontend:${{ github.sha }}
+            ghcr.io/EvgPokr/yaizy-python-ide/frontend:${{ github.ref_name }}
+            ghcr.io/EvgPokr/yaizy-python-ide/frontend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -92,8 +92,8 @@ jobs:
           context: docker/python-sandbox
           push: true
           tags: |
-            ghcr.io/${{ vars.REGISTRY_OWNER || 'yaizy-io' }}/yaizy-python-ide/sandbox:${{ github.ref_name }}
-            ghcr.io/${{ vars.REGISTRY_OWNER || 'yaizy-io' }}/yaizy-python-ide/sandbox:${{ github.sha }}
+            ghcr.io/EvgPokr/yaizy-python-ide/sandbox:${{ github.ref_name }}
+            ghcr.io/EvgPokr/yaizy-python-ide/sandbox:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -112,7 +112,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           ignore_known_hosts: true
           script_stop: true
-          envs: GHCR_USER,GHCR_PULL_TOKEN,JWT_SECRET,YAIZY_OAUTH_CLIENT_ID,YAIZY_OAUTH_CLIENT_SECRET,YAIZY_OAUTH_JWT_SECRET
+          envs: GHCR_USER,GHCR_PULL_TOKEN,JWT_SECRET,YAIZY_OAUTH_AUTHORIZE_URL,YAIZY_OAUTH_TOKEN_URL,YAIZY_OAUTH_REDIRECT_URI,YAIZY_OAUTH_CLIENT_ID,YAIZY_OAUTH_CLIENT_SECRET,YAIZY_OAUTH_JWT_SECRET,YAIZY_OAUTH_ISSUER
           script: |
             set -euo pipefail
 
@@ -126,15 +126,14 @@ jobs:
             cd "$APP_DIR"
             git fetch --all && git reset --hard origin/test
 
-            # 2. Write backend/.env from secrets (only keys that are provided).
+            # 2. Write backend/.env from vars/secrets (only keys that are provided).
             ENV_FILE="$APP_DIR/backend/.env"
             touch "$ENV_FILE"
             > "$ENV_FILE"
-            {
-              echo "YAIZY_OAUTH_AUTHORIZE_URL=https://yaizy.io/api/auth2/oauth/authorize"
-              echo "YAIZY_OAUTH_TOKEN_URL=https://yaizy.io/api/auth2/oauth/token"
-              echo "YAIZY_OAUTH_ISSUER=https://yaizy.io"
-            } >> "$ENV_FILE"
+            [ -n "${YAIZY_OAUTH_AUTHORIZE_URL:-}" ] && echo "YAIZY_OAUTH_AUTHORIZE_URL=$YAIZY_OAUTH_AUTHORIZE_URL" >> "$ENV_FILE"
+            [ -n "${YAIZY_OAUTH_TOKEN_URL:-}" ] && echo "YAIZY_OAUTH_TOKEN_URL=$YAIZY_OAUTH_TOKEN_URL" >> "$ENV_FILE"
+            [ -n "${YAIZY_OAUTH_REDIRECT_URI:-}" ] && echo "YAIZY_OAUTH_REDIRECT_URI=$YAIZY_OAUTH_REDIRECT_URI" >> "$ENV_FILE"
+            [ -n "${YAIZY_OAUTH_ISSUER:-}" ] && echo "YAIZY_OAUTH_ISSUER=$YAIZY_OAUTH_ISSUER" >> "$ENV_FILE"
             [ -n "${JWT_SECRET:-}" ] && echo "JWT_SECRET=$JWT_SECRET" >> "$ENV_FILE"
             [ -n "${YAIZY_OAUTH_CLIENT_ID:-}" ] && echo "YAIZY_OAUTH_CLIENT_ID=$YAIZY_OAUTH_CLIENT_ID" >> "$ENV_FILE"
             [ -n "${YAIZY_OAUTH_CLIENT_SECRET:-}" ] && echo "YAIZY_OAUTH_CLIENT_SECRET=$YAIZY_OAUTH_CLIENT_SECRET" >> "$ENV_FILE"
@@ -161,6 +160,10 @@ jobs:
           GHCR_USER: ${{ vars.GHCR_USER || 'yaizy-io' }}
           GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          YAIZY_OAUTH_CLIENT_ID: ${{ secrets.YAIZY_OAUTH_CLIENT_ID }}
+          YAIZY_OAUTH_AUTHORIZE_URL: ${{ vars.YAIZY_OAUTH_AUTHORIZE_URL }}
+          YAIZY_OAUTH_TOKEN_URL: ${{ vars.YAIZY_OAUTH_TOKEN_URL }}
+          YAIZY_OAUTH_REDIRECT_URI: ${{ vars.YAIZY_OAUTH_REDIRECT_URI }}
+          YAIZY_OAUTH_CLIENT_ID: ${{ vars.YAIZY_OAUTH_CLIENT_ID }}
           YAIZY_OAUTH_CLIENT_SECRET: ${{ secrets.YAIZY_OAUTH_CLIENT_SECRET }}
           YAIZY_OAUTH_JWT_SECRET: ${{ secrets.YAIZY_OAUTH_JWT_SECRET }}
+          YAIZY_OAUTH_ISSUER: ${{ vars.YAIZY_OAUTH_ISSUER }}

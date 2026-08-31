@@ -14,20 +14,20 @@ services:
   # (backend spawns sandbox containers via host docker.sock).
   # The dummy container is only so `docker compose pull` fetches it before backend starts.
   sandbox:
-    image: ${REGISTRY:-ghcr.io/yaizy-io/yaizy-python-ide}/sandbox:${IMAGE_TAG:-test}
+    image: ${REGISTRY:-ghcr.io/EvgPokr/yaizy-python-ide}/sandbox:${IMAGE_TAG:-test}
     command: /bin/true
     restart: "no"
     networks:
       - ide-network
 
   backend:
-    image: ${REGISTRY:-ghcr.io/yaizy-io/yaizy-python-ide}/backend:${IMAGE_TAG:-test}
+    image: ${REGISTRY:-ghcr.io/EvgPokr/yaizy-python-ide}/backend:${IMAGE_TAG:-test}
     env_file:
       - ../backend/.env
     environment:
       NODE_ENV: production
       PORT: 3001
-      DOCKER_IMAGE: ${REGISTRY:-ghcr.io/yaizy-io/yaizy-python-ide}/sandbox:${IMAGE_TAG:-test}
+      DOCKER_IMAGE: ${REGISTRY:-ghcr.io/EvgPokr/yaizy-python-ide}/sandbox:${IMAGE_TAG:-test}
       WORKSPACE_BASE_DIR: /tmp/python-sessions
       DB_DIR: /data
       FRONTEND_URL: https://${DOMAIN}
@@ -43,7 +43,7 @@ services:
       - ide-network
 
   nginx:
-    image: ${REGISTRY:-ghcr.io/yaizy-io/yaizy-python-ide}/frontend:${IMAGE_TAG:-test}
+    image: ${REGISTRY:-ghcr.io/EvgPokr/yaizy-python-ide}/frontend:${IMAGE_TAG:-test}
     ports:
       - "443:443"
     environment:
