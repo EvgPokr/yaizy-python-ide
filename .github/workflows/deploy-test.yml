@@ -14,8 +14,43 @@ permissions:
   packages: write
 
 jobs:
+  # Lint and typecheck the frontend and backend before any build/deploy.
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        working-directory: .
+        run: npm ci
+
+      - name: Frontend lint
+        working-directory: .
+        run: npm run lint
+
+      - name: Frontend typecheck
+        working-directory: .
+        run: npm run typecheck
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Backend lint
+        working-directory: backend
+        run: npm run lint
+
+      - name: Backend typecheck
+        working-directory: backend
+        run: npm run typecheck
+
   # Build images in CI and push them to GHCR (never built on the host).
   build-and-push:
+    needs: lint-and-typecheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
