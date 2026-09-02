@@ -33,7 +33,7 @@ export class PTYManager {
     sessionId: string,
     containerId: string,
     workspaceDir: string,
-    options: PTYOptions = {}
+    _options: PTYOptions = {}
   ): Promise<PTYSession> {
     try {
       console.log(`Creating PTY for session ${sessionId} in container ${containerId}...`);
