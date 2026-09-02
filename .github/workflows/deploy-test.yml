@@ -125,8 +125,8 @@ jobs:
             fi
             cd "$APP_DIR"
             git fetch --all
-            git sparse-checkout init --cone
-            git sparse-checkout set docker
+            git sparse-checkout init --no-cone
+            git sparse-checkout set --no-cone '/docker/'
             git reset --hard origin/test
 
             # Директории для gitignored-данных, которые читает compose:
