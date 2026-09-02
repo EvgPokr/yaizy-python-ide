@@ -35,7 +35,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/python-sessions:/tmp/python-sessions
-      - python-ide-data:/data
+      - ../backend/data:/data
     depends_on:
       - sandbox
     restart: unless-stopped
@@ -60,6 +60,3 @@ services:
 networks:
   ide-network:
     driver: bridge
-
-volumes:
-  python-ide-data:
