@@ -118,12 +118,20 @@ jobs:
             APP_DIR=/opt/python-ide
             REPO=https://github.com/${{ github.repository }}.git
 
-            # 1. Ensure the repo is present and up to date.
+            # 1. Sparse-checkout только docker/ (compose-конфиг), а не весь репо.
+            #    Blobs для остальных путей не качаются; src/, tests/, Dockerfile не нужны.
             if [ ! -d "$APP_DIR/.git" ]; then
-              git clone "$REPO" "$APP_DIR"
+              git clone --filter=blob:none --sparse "$REPO" "$APP_DIR"
             fi
             cd "$APP_DIR"
-            git fetch --all && git reset --hard origin/test
+            git fetch --all
+            git sparse-checkout init --cone
+            git sparse-checkout set docker
+            git reset --hard origin/test
+
+            # Директории для gitignored-данных, которые читает compose:
+            # backend/.env (env_file) и backend/data (bind-mount БД).
+            mkdir -p "$APP_DIR/backend/data"
 
             # 2. Write backend/.env from vars/secrets (only keys that are provided).
             ENV_FILE="$APP_DIR/backend/.env"
