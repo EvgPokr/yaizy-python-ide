@@ -74,6 +74,17 @@ export class AuthService {
   }
 
   /**
+   * Map an external (YaizY) user type onto the IDE's role model.
+   * YaizY calls the regular user role "student"; the IDE stores it as "user".
+   */
+  private normalizeRole(role: string | undefined): string {
+    if (!role || role === 'student') {
+      return 'user';
+    }
+    return role;
+  }
+
+  /**
    * Find a user by external (YaizY) identifier or create a new one.
    * The external id is an opaque identifier without personal data.
    */
@@ -91,6 +102,7 @@ export class AuthService {
 
     const userId = uuidv4();
     const username = `yaizy_${externalId.slice(0, 16)}`;
+    const normalizedRole = this.normalizeRole(role);
     // Local password login is disabled: store a non-bcrypt marker
     const disabledPasswordHash = `oauth-disabled:${crypto
       .randomBytes(24)
@@ -100,14 +112,14 @@ export class AuthService {
     db.prepare(`
       INSERT INTO users (id, username, password_hash, external_id, role, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(userId, username, disabledPasswordHash, externalId, role || 'user', now, now);
+    `).run(userId, username, disabledPasswordHash, externalId, normalizedRole, now, now);
 
     console.log(`✅ New OAuth user provisioned: ${username}`);
 
     return {
       id: userId,
       username,
-      role: role || 'user',
+      role: normalizedRole,
       created_at: now,
     };
   }

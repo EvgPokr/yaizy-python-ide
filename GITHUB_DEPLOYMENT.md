@@ -93,7 +93,7 @@ deploy job ── SSH (deploy@<host>) ──> git pull ──> docker compose pu
 2. Выпустить **TLS-сертификат** для `ide.yaizy.io` (certbot HTTP-01 standalone) + включить `certbot-renew.timer`.
 3. Создать **non-root пользователя `deploy`** (группа `docker`), владельца `/opt/python-ide`; настроить SSH-ключ.
 4. Каталоги: `/opt/python-ide`, `/tmp/python-sessions`.
-5. **Важно:** на проде уже могут быть данные студентов (`backend/data/python-ide.db`) и текущий systemd-сервис + host-nginx. Нужно:
+5. **Важно:** на проде уже могут быть данные студентов (`backend/data/python-ide.prod.db`) и текущий systemd-сервис + host-nginx. Нужно:
    - остановить старый `python-ide` (systemd) и снять host-nginx с 80/443;
    - при первом подъёме — перенести/примонтировать существующую БД (см. ниже про volume), чтобы не потерять проекты/аккаунты.
 

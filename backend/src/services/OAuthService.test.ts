@@ -2,7 +2,12 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { OAuthService, DEFAULT_REDIRECT, isSafeRedirect } from './OAuthService';
+import {
+  OAuthService,
+  DEFAULT_REDIRECT,
+  isSafeRedirect,
+  normalizeUserType,
+} from './OAuthService';
 
 const JWT_SECRET = 'test-shared-oauth-jwt-secret-0123456789';
 
@@ -114,6 +119,29 @@ describe('OAuthService', () => {
       const { state } = service.createAuthRequest('/editor/42');
       const pending = service.consumeAuthRequest(state)!;
       expect(pending.redirect).toBe('/editor/42');
+    });
+
+    it('defaults user_type to student and accepts teacher', () => {
+      const defaultReq = new URL(service.createAuthRequest().authorizeUrl);
+      expect(defaultReq.searchParams.get('user_type')).toBe('student');
+
+      const teacherReq = new URL(service.createAuthRequest(undefined, 'teacher').authorizeUrl);
+      expect(teacherReq.searchParams.get('user_type')).toBe('teacher');
+    });
+
+    it('falls back to student for an invalid user_type', () => {
+      const url = new URL(service.createAuthRequest(undefined, 'admin').authorizeUrl);
+      expect(url.searchParams.get('user_type')).toBe('student');
+    });
+  });
+
+  describe('normalizeUserType', () => {
+    it('accepts student and teacher only', () => {
+      expect(normalizeUserType(undefined)).toBe('student');
+      expect(normalizeUserType('student')).toBe('student');
+      expect(normalizeUserType('teacher')).toBe('teacher');
+      expect(normalizeUserType('admin')).toBe('student');
+      expect(normalizeUserType('user')).toBe('student');
     });
   });
 

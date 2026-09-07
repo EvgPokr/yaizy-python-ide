@@ -27,7 +27,7 @@ describe('AuthService (OAuth users)', () => {
 
       expect(user.id).toBeTruthy();
       expect(user.username).toBe('yaizy_external-id-1');
-      expect(user.role).toBe('student');
+      expect(user.role).toBe('user');
       expect(user.email).toBeUndefined();
       expect(user.full_name).toBeUndefined();
     });
@@ -46,6 +46,21 @@ describe('AuthService (OAuth users)', () => {
 
       expect(userA.id).not.toBe(userB.id);
     });
+
+    it('normalizes the student role to user', () => {
+      const user = authService.findOrCreateOAuthUser('external-id-student', 'student');
+      expect(user.role).toBe('user');
+    });
+
+    it('preserves the teacher role', () => {
+      const user = authService.findOrCreateOAuthUser('external-id-teacher', 'teacher');
+      expect(user.role).toBe('teacher');
+    });
+
+    it('defaults an unknown or missing role to user', () => {
+      expect(authService.findOrCreateOAuthUser('external-id-unknown', 'admin').role).toBe('user');
+      expect(authService.findOrCreateOAuthUser('external-id-absent', '').role).toBe('user');
+    });
   });
 
   describe('issueTokenForUser / verifyToken', () => {
@@ -56,7 +71,7 @@ describe('AuthService (OAuth users)', () => {
       const decoded = authService.verifyToken(token);
       expect(decoded.userId).toBe(user.id);
       expect(decoded.username).toBe(user.username);
-      expect(decoded.role).toBe('student');
+      expect(decoded.role).toBe('user');
     });
 
     it('rejects invalid tokens', () => {

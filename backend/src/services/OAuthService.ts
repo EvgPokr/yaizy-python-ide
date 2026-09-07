@@ -24,6 +24,13 @@ export interface AccessTokenPayload {
 }
 
 export const DEFAULT_REDIRECT = '/projects';
+export const DEFAULT_USER_TYPE = 'student';
+
+const ALLOWED_USER_TYPES = new Set(['student', 'teacher']);
+
+export function normalizeUserType(userType: string | undefined): string {
+  return userType && ALLOWED_USER_TYPES.has(userType) ? userType : DEFAULT_USER_TYPE;
+}
 
 /**
  * Only allow same-origin relative app paths as a post-login redirect.
@@ -85,7 +92,10 @@ export class OAuthService {
     }
   }
 
-  createAuthRequest(redirect?: string): { state: string; authorizeUrl: string } {
+  createAuthRequest(
+    redirect?: string,
+    userType?: string,
+  ): { state: string; authorizeUrl: string } {
     this.cleanupExpired();
 
     const state = crypto.randomBytes(32).toString('base64url');
@@ -109,7 +119,7 @@ export class OAuthService {
     url.searchParams.set('state', state);
     url.searchParams.set('code_challenge', codeChallenge);
     url.searchParams.set('code_challenge_method', 'S256');
-    url.searchParams.set('user_type', 'student');
+    url.searchParams.set('user_type', normalizeUserType(userType));
 
     return { state, authorizeUrl: url.toString() };
   }

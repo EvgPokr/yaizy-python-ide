@@ -18,7 +18,8 @@ function frontendUrl(path: string): string {
 router.get('/yaizy/login', (req: Request, res: Response) => {
   try {
     const redirect = isSafeRedirect(req.query.redirect as string | undefined);
-    const { authorizeUrl } = oauthService.createAuthRequest(redirect);
+    const userType = req.query.user_type as string | undefined;
+    const { authorizeUrl } = oauthService.createAuthRequest(redirect, userType);
     res.redirect(authorizeUrl);
   } catch (error: any) {
     console.error('OAuth login error:', error);
