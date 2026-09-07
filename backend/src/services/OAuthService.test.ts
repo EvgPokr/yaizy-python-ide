@@ -184,6 +184,16 @@ describe('OAuthService', () => {
       expect(payload.role).toBe('student');
     });
 
+    it('returns the name from the token when present', () => {
+      const payload = service.verifyAccessToken(issueToken({ name: 'Test Student' }));
+      expect(payload.name).toBe('Test Student');
+    });
+
+    it('returns undefined name when absent', () => {
+      const payload = service.verifyAccessToken(issueToken());
+      expect(payload.name).toBeUndefined();
+    });
+
     it('rejects a token signed with another secret', () => {
       const token = jwt.sign(
         { sub: 'x', aud: 'python-ide-test' },

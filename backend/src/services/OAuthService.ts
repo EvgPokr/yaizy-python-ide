@@ -21,6 +21,7 @@ export interface PendingAuthRequest {
 export interface AccessTokenPayload {
   sub: string;
   role: string;
+  name?: string;
 }
 
 export const DEFAULT_REDIRECT = '/projects';
@@ -191,6 +192,7 @@ export class OAuthService {
     return {
       sub: decoded.sub,
       role: typeof decoded.role === 'string' ? decoded.role : 'user',
+      name: typeof decoded.name === 'string' ? decoded.name : undefined,
     };
   }
 

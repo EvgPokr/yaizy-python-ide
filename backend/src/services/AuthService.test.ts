@@ -61,6 +61,32 @@ describe('AuthService (OAuth users)', () => {
       expect(authService.findOrCreateOAuthUser('external-id-unknown', 'admin').role).toBe('user');
       expect(authService.findOrCreateOAuthUser('external-id-absent', '').role).toBe('user');
     });
+
+    it('persists the display name as full_name', () => {
+      const user = authService.findOrCreateOAuthUser(
+        'external-id-name',
+        'student',
+        'Test Student',
+      );
+      expect(user.full_name).toBe('Test Student');
+      const found = authService.getUserById(user.id);
+      expect(found?.full_name).toBe('Test Student');
+    });
+
+    it('updates the full_name of an existing user', () => {
+      const first = authService.findOrCreateOAuthUser(
+        'external-id-upd',
+        'teacher',
+        'Old Name',
+      );
+      const updated = authService.findOrCreateOAuthUser(
+        'external-id-upd',
+        'teacher',
+        'New Name',
+      );
+      expect(updated.id).toBe(first.id);
+      expect(updated.full_name).toBe('New Name');
+    });
   });
 
   describe('issueTokenForUser / verifyToken', () => {

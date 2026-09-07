@@ -15,7 +15,7 @@ export interface User {
   id: string;
   username: string;
   email?: string;
-  full_name?: string;
+  full_name?: string | null;
   grade?: string;
   age?: number;
   role: string;
@@ -87,13 +87,20 @@ export class AuthService {
   /**
    * Find a user by external (YaizY) identifier or create a new one.
    * The external id is an opaque identifier without personal data.
+   * The optional display name is persisted as the user's full name.
    */
-  findOrCreateOAuthUser(externalId: string, role: string): User {
+  findOrCreateOAuthUser(externalId: string, role: string, name?: string): User {
     const existing = db
       .prepare('SELECT id FROM users WHERE external_id = ?')
       .get(externalId) as any;
 
     if (existing) {
+      if (name) {
+        db.prepare('UPDATE users SET full_name = ? WHERE id = ?').run(
+          name,
+          existing.id,
+        );
+      }
       const user = this.getUserById(existing.id);
       if (user) {
         return user;
@@ -103,6 +110,7 @@ export class AuthService {
     const userId = uuidv4();
     const username = `yaizy_${externalId.slice(0, 16)}`;
     const normalizedRole = this.normalizeRole(role);
+    const fullName = name ?? null;
     // Local password login is disabled: store a non-bcrypt marker
     const disabledPasswordHash = `oauth-disabled:${crypto
       .randomBytes(24)
@@ -110,9 +118,18 @@ export class AuthService {
     const now = Date.now();
 
     db.prepare(`
-      INSERT INTO users (id, username, password_hash, external_id, role, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(userId, username, disabledPasswordHash, externalId, normalizedRole, now, now);
+      INSERT INTO users (id, username, password_hash, external_id, role, full_name, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      userId,
+      username,
+      disabledPasswordHash,
+      externalId,
+      normalizedRole,
+      fullName,
+      now,
+      now,
+    );
 
     console.log(`✅ New OAuth user provisioned: ${username}`);
 
@@ -120,6 +137,7 @@ export class AuthService {
       id: userId,
       username,
       role: normalizedRole,
+      full_name: fullName,
       created_at: now,
     };
   }

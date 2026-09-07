@@ -62,7 +62,7 @@ router.get('/yaizy/callback', async (req: Request, res: Response) => {
     );
     const payload = oauthService.verifyAccessToken(accessToken);
 
-    const user = authService.findOrCreateOAuthUser(payload.sub, payload.role);
+    const user = authService.findOrCreateOAuthUser(payload.sub, payload.role, payload.name);
     const token = authService.issueTokenForUser(user);
 
     // Token is passed via URL fragment so it never reaches server logs.
