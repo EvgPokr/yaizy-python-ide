@@ -115,16 +115,18 @@ jobs:
           script: |
             set -euo pipefail
 
-            APP_DIR=/opt/python-ide
+            APP_DIR=/home/deploy/python-ide-prod
             REPO=https://github.com/${{ github.repository }}.git
 
-            # 1. Sparse-checkout только docker/ (compose-конфиг), а не весь репо.
-            #    Blobs для остальных путей не качаются; src/, tests/, Dockerfile не нужны.
+            # 1. Обновляем checkout до origin/main.
+            #    Сначала делаем hard reset, затем включаем sparse-checkout только для docker/.
+            #    Это убирает конфликты старого ручного запуска.
             if [ ! -d "$APP_DIR/.git" ]; then
               git clone --filter=blob:none --sparse "$REPO" "$APP_DIR"
             fi
             cd "$APP_DIR"
-            git fetch --all
+            git reset --hard || true
+            git fetch --all --prune
             git sparse-checkout init --no-cone
             git sparse-checkout set --no-cone '/docker/'
             git reset --hard origin/main

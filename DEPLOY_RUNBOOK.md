@@ -6,6 +6,13 @@
 - как деплоить на `prod`
 - как сделать первый безопасный cutover прода на контейнеры
 
+## Важно: active / reserve каталоги на prod
+
+- `active` (текущий контейнерный деплой): `/home/deploy/python-ide-prod`
+- `reserve` (старый standalone-каталог): `/opt/python-ide`
+
+`deploy-prod.yml` работает только с `active` каталогом и не изменяет `reserve`.
+
 ## 1) Что должно быть в репозитории
 
 - `docker/docker-compose.deploy.yml`
@@ -104,7 +111,7 @@ Secrets:
 
 1. Lint + typecheck
 2. Build/push образов с тегом `prod`
-3. SSH на prod host
+3. SSH на prod host (`active`: `/home/deploy/python-ide-prod`)
 4. Обновление `backend/.env` и `docker/.env` (`DOMAIN=ide.yaizy.io`, `IMAGE_TAG=prod`)
 5. `docker compose pull && docker compose up -d`
 6. Health check `https://ide.yaizy.io/health`
@@ -128,11 +135,16 @@ scp deploy@ide.yaizy.io:/opt/python-ide/backend/data/python-ide.db \
 
 1. Остановить старый backend-процесс (tsx/node), убедиться что `:3001` свободен.
 2. Остановить/отключить host nginx, чтобы освободить `:443`.
-3. Убедиться, что БД остаётся в `/opt/python-ide/backend/data/python-ide.db`.
+3. Скопировать БД в active-каталог:
+
+```bash
+mkdir -p /home/deploy/python-ide-prod/backend/data
+cp -a /opt/python-ide/backend/data/python-ide.db /home/deploy/python-ide-prod/backend/data/python-ide.db
+```
+
 4. Запустить `Deploy prod` (через merge в `main` или `workflow_dispatch`) и дать ему поднять контейнеры.
 5. Проверить `https://ide.yaizy.io/health` и базовый smoke.
-
-Важно: backend в контейнере использует `DB_DIR=/data` и bind-mount `../backend/data:/data`, поэтому работает с тем же файлом SQLite.
+Важно: backend в контейнере использует `DB_DIR=/data` и bind-mount `../backend/data:/data` внутри `active` каталога.
 
 ## 6) Rollback
 
@@ -141,10 +153,10 @@ scp deploy@ide.yaizy.io:/opt/python-ide/backend/data/python-ide.db \
 1. На хосте:
 
 ```bash
-docker compose -f /opt/python-ide/docker/docker-compose.deploy.yml down
+docker compose -f /home/deploy/python-ide-prod/docker/docker-compose.deploy.yml down
 ```
 
-2. Вернуть предыдущую рабочую схему (старый backend + nginx).
+2. Вернуть предыдущую рабочую схему из `reserve` (`/opt/python-ide`) при необходимости.
 3. При необходимости восстановить БД из backup.
 
 ## 7) Частые проблемы
