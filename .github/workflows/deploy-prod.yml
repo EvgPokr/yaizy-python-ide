@@ -119,14 +119,16 @@ jobs:
             REPO=https://github.com/${{ github.repository }}.git
 
             # 1. Обновляем checkout до origin/main.
-            #    Сначала делаем hard reset, затем включаем sparse-checkout только для docker/.
-            #    Это убирает конфликты старого ручного запуска.
+            #    Нормализуем рабочее дерево и заново применяем sparse-checkout,
+            #    чтобы деплой не падал на not uptodate/dirty state.
             if [ ! -d "$APP_DIR/.git" ]; then
               git clone --filter=blob:none --sparse "$REPO" "$APP_DIR"
             fi
             cd "$APP_DIR"
-            git reset --hard || true
             git fetch --all --prune
+            git reset --hard
+            git clean -fd -e backend/.env -e backend/data/
+            git sparse-checkout disable || true
             git sparse-checkout init --no-cone
             git sparse-checkout set --no-cone '/docker/'
             git reset --hard origin/main
@@ -148,6 +150,12 @@ jobs:
             [ -n "${YAIZY_OAUTH_CLIENT_SECRET:-}" ] && echo "YAIZY_OAUTH_CLIENT_SECRET=$YAIZY_OAUTH_CLIENT_SECRET" >> "$ENV_FILE"
             [ -n "${YAIZY_OAUTH_JWT_SECRET:-}" ] && echo "YAIZY_OAUTH_JWT_SECRET=$YAIZY_OAUTH_JWT_SECRET" >> "$ENV_FILE"
             echo "--- backend/.env written ---"
+
+            # Fail-fast: container backend requires JWT_SECRET length >= 32.
+            if [ -z "${JWT_SECRET:-}" ] || [ ${#JWT_SECRET} -lt 32 ]; then
+              echo "JWT_SECRET is missing or too short (<32) in GitHub Environment prod"
+              exit 1
+            fi
 
             # 3. Write the gitignored docker/.env (non-secret: domain + image tag).
             cat > "$APP_DIR/docker/.env" <<ENVEOF
