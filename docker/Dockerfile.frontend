@@ -1,0 +1,30 @@
+# Frontend build + nginx runtime (multi-stage)
+# Build context is the repo root (see the deploy workflow).
+
+# --- Build stage ---
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+# Production: same-origin API (empty base URL -> relative paths)
+ARG VITE_BACKEND_URL=""
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
+RUN npm run build
+
+# --- Runtime stage ---
+FROM nginx:alpine
+
+# nginx:alpine runs envsubst on /etc/nginx/templates/*.template at startup,
+# so ${DOMAIN} below is substituted from the container env.
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY docker/nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
+
+EXPOSE 443
+
+CMD ["nginx", "-g", "daemon off;"]

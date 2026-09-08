@@ -1,6 +1,50 @@
+# Dev-окружение: всё в контейнерах (frontend + backend + python-sandbox).
+# Frontend: Vite с hot-reload через volume, порт 5173.
+# Backend:  tsx watch через volume (hot reload), порт 3001.
+# Sandbox:  образ python-sandbox:latest, который backend создаёт динамически через docker.sock.
 services:
+  # Python sandbox — образ, который backend спавнит динамически (через docker.sock хоста).
+  sandbox:
+    build:
+      context: ./python-sandbox
+      dockerfile: Dockerfile
+    image: python-sandbox:latest
+    command: /bin/true
+    restart: "no"
+    networks:
+      - python-ide-network
+
+  # Backend (Express + tsx watch, hot reload через volume src).
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    env_file:
+      - ../backend/.env
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      FRONTEND_URL: http://localhost:5173
+      DOCKER_IMAGE: python-sandbox:latest
+      WORKSPACE_BASE_DIR: /tmp/python-sessions
+      DB_DIR: /app/data
+    command: npm run dev
+    volumes:
+      - ../backend/src:/app/src
+      - ../backend/data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/python-sessions:/tmp/python-sessions
+    depends_on:
+      - sandbox
+    restart: unless-stopped
+    networks:
+      - python-ide-network
+
+  # Frontend (Vite + React, hot reload через volume).
   frontend:
-    image: node:20-alpine
+    image: node:22-alpine
     working_dir: /app
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
     ports:
@@ -15,6 +59,10 @@ services:
     restart: unless-stopped
     networks:
       - python-ide-network
+
+networks:
+  python-ide-network:
+    driver: bridge
 
 volumes:
   frontend-node-modules:

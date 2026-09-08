@@ -7,7 +7,7 @@ import { ProfileDropdown } from '@/components/Auth/ProfileDropdown';
 import './ProjectsPage.css';
 
 export const ProjectsPage: React.FC = () => {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
@@ -137,11 +137,6 @@ export const ProjectsPage: React.FC = () => {
   const visibleProjects = selectedFolder
     ? projects.filter(p => p.folder_id === selectedFolder)
     : projects; // Show all projects when no folder selected
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   const getUniqueUntitledName = () => {
     // Get all existing project names

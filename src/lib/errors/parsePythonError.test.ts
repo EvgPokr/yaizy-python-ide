@@ -10,7 +10,7 @@ NameError: name 'x' is not defined`;
     const result = parsePythonError(errorString);
 
     expect(result.type).toBe('NameError');
-    expect(result.title).toBe('Неизвестное имя');
+    expect(result.title).toBe('Unknown Name');
     expect(result.location.line).toBe(3);
     expect(result.explanation).toContain('x');
     expect(result.fixSteps.length).toBeGreaterThan(0);
@@ -26,9 +26,9 @@ SyntaxError: invalid syntax`;
     const result = parsePythonError(errorString);
 
     expect(result.type).toBe('SyntaxError');
-    expect(result.title).toBe('Синтаксическая ошибка');
+    expect(result.title).toBe('Syntax Error');
     expect(result.location.line).toBe(2);
-    expect(result.explanation).toContain('двоеточие');
+    expect(result.explanation).toContain('colon');
     expect(result.confidence).toBe('high');
   });
 
@@ -40,8 +40,8 @@ TypeError: unsupported operand type(s) for +: 'int' and 'str'`;
     const result = parsePythonError(errorString);
 
     expect(result.type).toBe('TypeError');
-    expect(result.title).toBe('Неправильный тип данных');
-    expect(result.explanation).toContain('типами данных');
+    expect(result.title).toBe('Type Error');
+    expect(result.explanation).toContain('incompatible data types');
     expect(result.fixSteps.length).toBeGreaterThan(0);
     expect(result.confidence).toBe('high');
   });
@@ -54,9 +54,9 @@ IndexError: list index out of range`;
     const result = parsePythonError(errorString);
 
     expect(result.type).toBe('IndexError');
-    expect(result.title).toBe('Выход за границы списка');
+    expect(result.title).toBe('Index Out of Range');
     expect(result.location.line).toBe(2);
-    expect(result.explanation).toContain('список');
+    expect(result.explanation).toContain('list');
     expect(result.confidence).toBe('high');
   });
 
@@ -67,8 +67,8 @@ UnknownError: something went wrong`;
 
     const result = parsePythonError(errorString);
 
-    expect(result.type).toBe('Error');
-    expect(result.title).toBe('Ошибка выполнения');
+    expect(result.type).toBe('UnknownError');
+    expect(result.title).toBe('Runtime Error');
     expect(result.confidence).toBe('low');
   });
 

@@ -3,11 +3,6 @@ import { IncomingMessage } from 'http';
 import { SessionManager } from '../services/SessionManager.js';
 import { authService } from '../services/AuthService';
 
-interface CanvasClient {
-  sessionId: string;
-  ws: WebSocket;
-}
-
 const canvasClients = new Map<string, Set<WebSocket>>();
 
 export function handleCanvasWebSocket(
@@ -32,7 +27,7 @@ export function handleCanvasWebSocket(
       return;
     }
 
-    const sessionIdMatch = url.match(/\/api\/sessions\/([^\/]+)\/canvas/);
+    const sessionIdMatch = url.match(/\/api\/sessions\/([^/]+)\/canvas/);
     
     if (!sessionIdMatch) {
       ws.close(1008, 'Invalid session ID');

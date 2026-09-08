@@ -176,6 +176,44 @@ npm run test:e2e
 
 ---
 
+## 🔐 Authentication (YaizY OAuth)
+
+Login is handled exclusively through the YaizY platform via
+**OAuth 2.0 Authorization Code + PKCE** (one-way: yaizy → python-ide).
+There is no local registration, password login, or password reset.
+
+Flow:
+
+1. User opens the IDE (e.g. via the "Open Python IDE" button in the yaizy
+   student dashboard, which points to the `/api/auth2/student/python-ide-launch`
+   endpoint of the yaizy auth service) — or opens the IDE directly.
+2. Without a session, the IDE redirects to the yaizy authorization endpoint
+   (`/oauth/authorize`). An already logged-in yaizy user passes silently;
+   an unauthenticated user is sent to the yaizy login page first.
+3. Yaizy redirects back to `GET /api/auth/oauth/yaizy/callback` with a
+   one-time `code`. The backend exchanges it at the yaizy token endpoint
+   (with `code_verifier` and client credentials) and receives a short-lived
+   JWT.
+4. The JWT carries **no personal data** — only an opaque user identifier
+   (`sub`, HMAC-derived from the yaizy user id) and the role. The backend
+   provisions/loads a local user by that identifier and issues its own
+   session token, which is passed to the frontend via the URL fragment.
+
+Backend environment variables (`backend/.env`):
+
+| Variable | Description |
+|---|---|
+| `YAIZY_OAUTH_AUTHORIZE_URL` | yaizy authorize endpoint, e.g. `https://yaizy.io/api/auth2/oauth/authorize` |
+| `YAIZY_OAUTH_TOKEN_URL` | yaizy token endpoint, e.g. `https://yaizy.io/api/auth2/oauth/token` |
+| `YAIZY_OAUTH_CLIENT_ID` | OAuth client id issued for this app |
+| `YAIZY_OAUTH_CLIENT_SECRET` | OAuth client secret |
+| `YAIZY_OAUTH_REDIRECT_URI` | Public callback URL, e.g. `http://localhost:3001/api/auth/oauth/yaizy/callback` |
+| `YAIZY_OAUTH_JWT_SECRET` | Shared secret to verify yaizy access tokens (HS256) |
+| `YAIZY_OAUTH_ISSUER` | Expected token issuer, e.g. `https://yaizy.io` |
+| `FRONTEND_URL` | Where to redirect after the callback (default `http://localhost:5173`) |
+
+---
+
 ## 🔒 Security
 
 - **Docker isolation** - Each session runs in separate container

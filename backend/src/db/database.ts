@@ -79,6 +79,12 @@ export function initDatabase() {
       console.log('Adding age column to users table...');
       db.exec('ALTER TABLE users ADD COLUMN age INTEGER');
     }
+
+    if (!userColumnNames.includes('external_id')) {
+      console.log('Adding external_id column to users table...');
+      db.exec('ALTER TABLE users ADD COLUMN external_id TEXT');
+      db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_external_id ON users(external_id)');
+    }
   } catch (error) {
     console.error('User migration error:', error);
   }
@@ -118,37 +124,6 @@ export function initDatabase() {
       FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
     )
   `);
-
-  // Password reset tokens table
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS password_reset_tokens (
-      id TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL,
-      token TEXT UNIQUE NOT NULL,
-      expires_at INTEGER NOT NULL,
-      used INTEGER DEFAULT 0,
-      created_at INTEGER NOT NULL,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )
-  `);
-
-  // Create default demo account only when explicitly enabled
-  if (process.env.ENABLE_DEMO_ACCOUNT === 'true') {
-    const defaultUser = db.prepare('SELECT id FROM users WHERE username = ?').get('demo');
-    if (!defaultUser) {
-      const bcrypt = require('bcrypt');
-      const defaultPassword = bcrypt.hashSync('demo123', 10);
-      const userId = require('uuid').v4();
-      const now = Date.now();
-
-      db.prepare(`
-        INSERT INTO users (id, username, password_hash, full_name, role, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `).run(userId, 'demo', defaultPassword, 'Demo User', 'user', now, now);
-
-      console.log('✅ Demo account created (ENABLE_DEMO_ACCOUNT=true)');
-    }
-  }
 
   console.log('✅ Database initialized');
 }

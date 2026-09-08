@@ -370,27 +370,28 @@ export class TurtleRenderer {
         this.clear('white');
         break;
 
-      case 'write':
+      case 'write': {
         // Restore canvas without turtle
         if (this.canvasSnapshot && state.visible) {
           this.ctx.putImageData(this.canvasSnapshot, 0, 0);
         }
-        
+
         // Draw text
         const { text, x, y, align, font } = cmd;
         const [fontFamily, fontSize, fontStyle] = font;
-        
+
         this.ctx.font = `${fontStyle} ${fontSize}px ${fontFamily}`;
         this.ctx.textAlign = align as CanvasTextAlign;
         this.ctx.textBaseline = 'middle';
         this.ctx.fillStyle = state.pen_color;
         this.ctx.fillText(text, this.toCanvasX(x), this.toCanvasY(y));
-        
+
         if (state.visible) {
           this.saveCanvasSnapshot();
           this.drawTurtle(state.x, state.y, state.angle);
         }
         break;
+      }
 
       case 'done':
         // Animation complete
@@ -438,7 +439,6 @@ export class TurtleRenderer {
   private drawTurtle(x: number, y: number, angle: number) {
     const cx = this.toCanvasX(x);
     const cy = this.toCanvasY(y);
-    const angleRad = (-angle * Math.PI) / 180; // Negative because canvas Y is flipped
 
     this.ctx.save();
     this.ctx.translate(cx, cy);

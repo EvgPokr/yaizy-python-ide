@@ -2,7 +2,7 @@
  * Auth API client
  */
 
-const API_BASE_URL =
+export const API_BASE_URL =
   (import.meta as any).env?.VITE_BACKEND_URL ||
   ((import.meta as any).env?.MODE === 'production'
     ? ''
@@ -17,11 +17,6 @@ export interface User {
   age?: number;
   role: string;
   created_at: number;
-}
-
-export interface LoginResult {
-  user: User;
-  token: string;
 }
 
 class AuthClient {
@@ -69,25 +64,11 @@ class AuthClient {
   }
 
   /**
-   * Login
+   * Start the YaizY OAuth login flow (redirect to the backend,
+   * which redirects to the YaizY authorization server).
    */
-  async login(username: string, password: string): Promise<LoginResult> {
-    const response = await fetch(`${this.baseUrl}/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Login failed');
-    }
-
-    const result: LoginResult = await response.json();
-    this.setToken(result.token);
-    return result;
+  startOAuthLogin() {
+    window.location.href = `${this.baseUrl}/api/auth/oauth/yaizy/login`;
   }
 
   /**
@@ -95,43 +76,6 @@ class AuthClient {
    */
   logout() {
     this.setToken(null);
-  }
-
-  /**
-   * Register new user
-   */
-  async register(
-    username: string,
-    password: string,
-    fullName?: string,
-    email?: string,
-    grade?: string,
-    age?: string
-  ): Promise<LoginResult> {
-    const response = await fetch(`${this.baseUrl}/api/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username,
-        password,
-        fullName,
-        email,
-        grade,
-        age: age ? parseInt(age) : undefined,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Registration failed');
-    }
-
-    const user: User = await response.json();
-
-    // Auto-login after registration
-    return this.login(username, password);
   }
 
   /**

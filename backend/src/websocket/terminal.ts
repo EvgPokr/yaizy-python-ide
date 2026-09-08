@@ -83,9 +83,7 @@ export class TerminalWebSocketHandler {
 
     // Buffer for accumulating data and detecting canvas markers
     let dataBuffer = '';
-    let skipUntilRunStart = false;
-    let hideCommandEcho = false;
-    
+
     // Flush interval to prevent stuck buffers
     const flushInterval = setInterval(() => {
       if (dataBuffer.length > 0 && ws.readyState === WebSocket.OPEN) {

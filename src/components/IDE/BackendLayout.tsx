@@ -33,8 +33,6 @@ export const BackendLayout: React.FC = () => {
     isRunning,
     error,
     runCode,
-    stopExecution,
-    resetSession,
     sendInput,
     resize,
   } = useBackendSession();
