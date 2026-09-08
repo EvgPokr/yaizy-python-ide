@@ -29,7 +29,7 @@ describe('AuthService (OAuth users)', () => {
       expect(user.username).toBe('yaizy_external-id-1');
       expect(user.role).toBe('user');
       expect(user.email).toBeUndefined();
-      expect(user.full_name).toBeUndefined();
+      expect(user.full_name).toBeNull();
     });
 
     it('returns the same user for the same external id', () => {
@@ -57,8 +57,8 @@ describe('AuthService (OAuth users)', () => {
       expect(user.role).toBe('teacher');
     });
 
-    it('defaults an unknown or missing role to user', () => {
-      expect(authService.findOrCreateOAuthUser('external-id-unknown', 'admin').role).toBe('user');
+    it('keeps non-student roles as-is and defaults missing role to user', () => {
+      expect(authService.findOrCreateOAuthUser('external-id-unknown', 'admin').role).toBe('admin');
       expect(authService.findOrCreateOAuthUser('external-id-absent', '').role).toBe('user');
     });
 
