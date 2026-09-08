@@ -119,14 +119,16 @@ jobs:
             REPO=https://github.com/${{ github.repository }}.git
 
             # 1. Обновляем checkout до origin/main.
-            #    Сначала делаем hard reset, затем включаем sparse-checkout только для docker/.
-            #    Это убирает конфликты старого ручного запуска.
+            #    Нормализуем рабочее дерево и заново применяем sparse-checkout,
+            #    чтобы деплой не падал на not uptodate/dirty state.
             if [ ! -d "$APP_DIR/.git" ]; then
               git clone --filter=blob:none --sparse "$REPO" "$APP_DIR"
             fi
             cd "$APP_DIR"
-            git reset --hard || true
             git fetch --all --prune
+            git reset --hard
+            git clean -fd -e backend/.env -e backend/data/
+            git sparse-checkout disable || true
             git sparse-checkout init --no-cone
             git sparse-checkout set --no-cone '/docker/'
             git reset --hard origin/main
@@ -135,18 +137,28 @@ jobs:
             # backend/.env (env_file) и backend/data (bind-mount БД).
             mkdir -p "$APP_DIR/backend/data"
 
-            # 2. Write backend/.env from vars/secrets (only keys that are provided).
+            # 2. Write backend/.env atomically from vars/secrets.
+            #    Never truncate the live file before validation.
             ENV_FILE="$APP_DIR/backend/.env"
-            touch "$ENV_FILE"
-            > "$ENV_FILE"
-            [ -n "${YAIZY_OAUTH_AUTHORIZE_URL:-}" ] && echo "YAIZY_OAUTH_AUTHORIZE_URL=$YAIZY_OAUTH_AUTHORIZE_URL" >> "$ENV_FILE"
-            [ -n "${YAIZY_OAUTH_TOKEN_URL:-}" ] && echo "YAIZY_OAUTH_TOKEN_URL=$YAIZY_OAUTH_TOKEN_URL" >> "$ENV_FILE"
-            [ -n "${YAIZY_OAUTH_REDIRECT_URI:-}" ] && echo "YAIZY_OAUTH_REDIRECT_URI=$YAIZY_OAUTH_REDIRECT_URI" >> "$ENV_FILE"
-            [ -n "${YAIZY_OAUTH_ISSUER:-}" ] && echo "YAIZY_OAUTH_ISSUER=$YAIZY_OAUTH_ISSUER" >> "$ENV_FILE"
-            [ -n "${JWT_SECRET:-}" ] && echo "JWT_SECRET=$JWT_SECRET" >> "$ENV_FILE"
-            [ -n "${YAIZY_OAUTH_CLIENT_ID:-}" ] && echo "YAIZY_OAUTH_CLIENT_ID=$YAIZY_OAUTH_CLIENT_ID" >> "$ENV_FILE"
-            [ -n "${YAIZY_OAUTH_CLIENT_SECRET:-}" ] && echo "YAIZY_OAUTH_CLIENT_SECRET=$YAIZY_OAUTH_CLIENT_SECRET" >> "$ENV_FILE"
-            [ -n "${YAIZY_OAUTH_JWT_SECRET:-}" ] && echo "YAIZY_OAUTH_JWT_SECRET=$YAIZY_OAUTH_JWT_SECRET" >> "$ENV_FILE"
+            TMP_ENV="$APP_DIR/backend/.env.tmp"
+            : > "$TMP_ENV"
+            [ -n "${YAIZY_OAUTH_AUTHORIZE_URL:-}" ] && echo "YAIZY_OAUTH_AUTHORIZE_URL=$YAIZY_OAUTH_AUTHORIZE_URL" >> "$TMP_ENV"
+            [ -n "${YAIZY_OAUTH_TOKEN_URL:-}" ] && echo "YAIZY_OAUTH_TOKEN_URL=$YAIZY_OAUTH_TOKEN_URL" >> "$TMP_ENV"
+            [ -n "${YAIZY_OAUTH_REDIRECT_URI:-}" ] && echo "YAIZY_OAUTH_REDIRECT_URI=$YAIZY_OAUTH_REDIRECT_URI" >> "$TMP_ENV"
+            [ -n "${YAIZY_OAUTH_ISSUER:-}" ] && echo "YAIZY_OAUTH_ISSUER=$YAIZY_OAUTH_ISSUER" >> "$TMP_ENV"
+            [ -n "${JWT_SECRET:-}" ] && echo "JWT_SECRET=$JWT_SECRET" >> "$TMP_ENV"
+            [ -n "${YAIZY_OAUTH_CLIENT_ID:-}" ] && echo "YAIZY_OAUTH_CLIENT_ID=$YAIZY_OAUTH_CLIENT_ID" >> "$TMP_ENV"
+            [ -n "${YAIZY_OAUTH_CLIENT_SECRET:-}" ] && echo "YAIZY_OAUTH_CLIENT_SECRET=$YAIZY_OAUTH_CLIENT_SECRET" >> "$TMP_ENV"
+            [ -n "${YAIZY_OAUTH_JWT_SECRET:-}" ] && echo "YAIZY_OAUTH_JWT_SECRET=$YAIZY_OAUTH_JWT_SECRET" >> "$TMP_ENV"
+
+            # Fail-fast: container backend requires JWT_SECRET length >= 32.
+            if [ -z "${JWT_SECRET:-}" ] || [ ${#JWT_SECRET} -lt 32 ]; then
+              echo "JWT_SECRET is missing or too short (<32) in GitHub Environment prod"
+              rm -f "$TMP_ENV"
+              exit 1
+            fi
+
+            mv "$TMP_ENV" "$ENV_FILE"
             echo "--- backend/.env written ---"
 
             # 3. Write the gitignored docker/.env (non-secret: domain + image tag).
