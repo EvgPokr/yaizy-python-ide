@@ -5,7 +5,7 @@ import rateLimit from 'express-rate-limit';
  */
 export const apiLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10), // 1 minute
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '1000', 10),
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -27,7 +27,7 @@ export const sessionCreationLimiter = rateLimit({
  */
 export const executionLimiter = rateLimit({
   windowMs: parseInt(process.env.EXECUTION_RATE_LIMIT_WINDOW_MS || '10000', 10),
-  max: parseInt(process.env.EXECUTION_RATE_LIMIT_MAX || '30', 10),
+  max: parseInt(process.env.EXECUTION_RATE_LIMIT_MAX || '300', 10),
   message: 'Please wait before executing code again.',
   standardHeaders: true,
   legacyHeaders: false,

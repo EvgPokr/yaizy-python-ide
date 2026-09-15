@@ -22,7 +22,7 @@ export class SessionManager {
     
     // Configuration from environment
     this.SESSION_TIMEOUT_MS = parseInt(process.env.SESSION_TIMEOUT_MS || '86400000', 10);
-    this.MAX_SESSIONS_PER_IP = parseInt(process.env.MAX_SESSIONS_PER_IP || '10', 10);
+    this.MAX_SESSIONS_PER_IP = parseInt(process.env.MAX_SESSIONS_PER_IP || '100', 10);
     this.MAX_EXECUTIONS_PER_HOUR = parseInt(process.env.MAX_EXECUTIONS_PER_HOUR || '1000', 10);
     this.WORKSPACE_BASE_DIR = process.env.WORKSPACE_BASE_DIR || '/tmp/python-sessions';
 
