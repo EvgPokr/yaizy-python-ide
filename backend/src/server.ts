@@ -101,6 +101,9 @@ class Server {
     this.app.use(express.json({ limit: '1mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
+    // Trust nginx so req.ip is the client, not the proxy container
+    this.app.set('trust proxy', 1);
+
     // Rate limiting
     this.app.use('/api/', apiLimiter);
 
